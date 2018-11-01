@@ -1,0 +1,163 @@
+<div class="row">
+  <!--left hand side panel-->
+  <div class="col-sm-4">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="panel panel-card">
+          <div class="card-heading">
+            <h2>Selected Parameters</h2>
+          </div>
+          <div class="p">
+            Generate a CSV export of buyers' profiles based on :
+          </div>
+          <div class="list-group no-radius no-border">
+            <div class="list-group-item">
+              <span class="pull-right">{{vm.parameters.start| date : 'dd/MM/yyyy'}} - {{vm.parameters.end| date : 'dd/MM/yyyy'}}</span>              Date
+            </div>
+            <div class="list-group-item">
+              <span class="pull-right">{{vm.parameters.category.length?vm.parameters.category.length:'All'}}</span> Categories
+            </div>
+            <div class="list-group-item">
+              <span class="pull-right">{{vm.parameters.tag.length?vm.parameters.tag.length:'All'}}</span> Tags
+            </div>
+            <div class="list-group-item">
+              <span class="pull-right">{{vm.parameters.campaign.length?vm.parameters.campaign.length:'All'}}</span> Campaigns
+            </div>
+          </div>
+          <div class="list-group-item">
+            <span class="pull-right">{{vm.parameters.coupon.length?vm.parameters.coupon.length:'All'}}</span> Coupons
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-8">
+    <div class="row">
+      <div class="panel panel-card">
+        <div class="panel-body">
+            <div class="form-group">
+              <div class="col-sm-6">
+                <label> Start Date</label>
+                <md-datepicker ng-model="vm.parameters.start" md-placeholder="Start Date" required></md-datepicker>
+              </div>
+              <div class="col-sm-6">
+                <label> End Date</label>
+                <md-datepicker ng-model="vm.parameters.end" md-placeholder="End Date" required></md-datepicker>
+              </div>
+            </div>
+            <div class="form-group" ng-if="vm.campaign.redeemer_credit">
+              <div class="col-sm-4">
+                <label>Redeemer Credit Amount</label>
+                <input type="number" class="form-control" placeholder="Credits" ng-model="vm.campaign.redeemer_credit.amount" ui-validate=" '$value >= 1' "
+                  required>
+              </div>
+            </div>
+        </div>
+      </div>
+      <div class="panel panel-card">
+        <div class="panel-heading col-sm-12">
+          <div class="col-sm-3">
+            <label>Categories</label>
+          </div>
+          <div class="col-sm-9">
+            <md-autocomplete md-no-cache="true" md-selected-item-change="vm.addItem(item,vm.parameters.category)" md-items="item in vm.categoryList| filter :vm.text.category"
+              md-search-text="vm.text.category" md-item-text="item.title">
+              <span>{{ item.title }}</span>
+            </md-autocomplete>
+          </div>
+        </div>
+        <div class="panel-body">
+          <span ng-repeat="category in vm.parameters.category"> <button class="btn-primary"ng-click="vm.removeItem(category,vm.parameters.category)">{{category.title}}</button></span>
+        </div>
+      </div>
+      <div class="panel panel-card">
+        <div class="panel-heading col-sm-12">
+          <div class="col-sm-3">
+            <label>Tags</label>
+          </div>
+          <div class="col-sm-9">
+            <form ng-submit="vm.addItem(vm.text.tag.toLowerCase(),vm.parameters.tag)">
+              <md-input-container>
+                <input mdInput placeholder="add a Tag" ng-model="vm.text.tag">
+              </md-input-container>
+              <span>
+                <md-button class="md-raised md-primary" ng-click="vm.addItem(vm.text.tag.toLowerCase(),vm.parameters.tag)">Add</md-button>
+              </span>
+            </form>
+          </div>
+        </div>
+        <div class="panel-body">
+          <span ng-repeat="tag in vm.parameters.tag"> <button class="btn-primary"ng-click="vm.removeItem(tag,vm.parameters.tag)">{{tag}}</button></span>
+        </div>
+      </div>
+      <div class="panel panel-card">
+        <div class="panel-heading col-sm-12">
+          <div class="col-sm-6">
+            <div class="col-sm-6">
+              <label> Discount type</label>
+            </div>
+            <div class="col-sm-6">
+              <md-input-container>
+                <label>Discount type</label>
+                <md-select ng-model="vm.campaignType" ng-change="vm.getCampaign()">
+                  <md-option value="credits">CREDITS</md-option>
+                  <md-option value="coupon">COUPON</md-option>
+                  <md-option value="basket">BASKET</md-option>
+                  <md-option value="referral">REFERRAL</md-option>
+                </md-select>
+              </md-input-container>
+            </div>
+          </div>
+          <div class="col-sm-6" ng-if="vm.campaign.length">
+            
+            <div class="col-sm-8">
+              <md-autocomplete 
+              flex
+              md-floating-label="Campaign"
+              md-no-cache="true" md-selected-item-change="vm.addItem(item,vm.parameters.campaign)" md-items="item in vm.campaign| filter :vm.text.campaign"
+                md-search-text="vm.text.campaign" md-item-text="item.name">
+                <span>{{ item.name }}</span>
+              </md-autocomplete>
+            </div>
+            <div class="col-sm-4" ng-if="vm.text.campaign&&vm.filter(vm.campaign,vm.text.campaign).length">
+              <md-button class="md-raised md-primary" ng-click="vm.addItems(vm.filter(vm.campaign,vm.text.campaign),vm.parameters.campaign)">Add All</md-button>
+            </div>
+          </div>
+        </div>
+        <div class="panel-body">
+          <span ng-repeat="campaign in vm.parameters.campaign"> <button class="btn-primary" ng-click="vm.removeItem(campaign,vm.parameters.campaign)">{{campaign.name}}</button></span>
+        </div>
+      </div>
+      <div class="panel panel-card">
+        <div class="panel-heading col-sm-12">
+          <div class="col-sm-3">
+            <label>Coupon Code</label>
+          </div>
+          <div class="col-sm-9">
+            <form ng-submit="vm.addItem(vm.text.coupon.toUpperCase(),vm.parameters.coupon)">
+              <md-input-container>
+                <input mdInput placeholder="add a Coupon Code" ng-model="vm.text.coupon">
+              </md-input-container>
+              <span>
+                <md-button class="md-raised md-primary" ng-click="vm.addItem(vm.text.coupon.toUpperCase(),vm.parameters.coupon)">Add</md-button>
+              </span>
+            </form>
+          </div>
+        </div>
+        <div class="panel-body">
+          <span ng-repeat="coupon in vm.parameters.coupon"> <button class="btn-primary"ng-click="vm.removeItem(coupon,vm.parameters.coupon)">{{coupon}}</button></span>
+        </div>
+      </div>
+      <div class="p col-sm-8" ng-if="vm.loading">
+          <p>Loading
+            <a ng-click="vm.cancel()">
+              <i class="fa fa-close i-20"></i>
+            </a>
+          </p>
+          <md-progress-linear md-mode="indeterminate" class="m-b"></md-progress-linear>
+        </div>
+      <md-button class="md-raised md-primary pull-right" ng-click="vm.csvDownload()" ng-disabled="vm.loading">Download CSV</md-button>
+    </div>
+  </div>
+</div>
+<!--right hand side panel-->

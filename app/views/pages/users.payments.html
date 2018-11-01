@@ -1,0 +1,169 @@
+<div class="row">
+  <!--left hand side panel-->
+  <div class="col-sm-4">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="panel panel-card">
+          <div class="card-heading">
+            <h2>Payment Report</h2>
+          </div>
+          <div class="list-group no-radius no-border">
+            <div class="list-group-item">
+              <span class="pull-right">£{{vm.amount}}</span> Min amount
+            </div>
+            <div class="list-group-item">
+              <span class="pull-right">£{{vm.amountResult.total_amount}}</span> Total Amount to pay
+            </div>
+            <div class="list-group-item">
+              <span class="pull-right">{{vm.amountResult.creators_number}}</span> Creators to pay
+            </div>
+            <div class="list-group-item">
+              <span class="pull-right">{{vm.amountResult.invalid_creators_number}}</span> Creators unabled to be paid
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--right hand side panel-->
+  <div class="col-sm-8">
+    <div class="row">
+      <div class="panel panel-card">
+        <div class="panel-body">
+          <md-input-container>
+            <input mdInput placeholder="Min amount" ng-model="vm.amount" type="number" min="0" ng-change="vm.unpaidCreatorsReport()"
+              ng-disabled="vm.loading">
+          </md-input-container>
+          <md-button class="md-raised md-primary pull-right" type="submit" ng-click="vm.massivePayment()">Mass Payment!</md-button>
+          <div class="panel-body text-center" ng-if="vm.loading">
+            <p>Loading</p>
+            <md-progress-linear md-mode="indeterminate" class="m-b"></md-progress-linear>
+          </div>
+          <div class="panel-body text-center" ng-if="vm.data">
+            <div class- "h3">Successful Payments: {{vm.data.successful_payments.length}}
+              <br>Failed Payments: {{vm.data.failed_payments.length}}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel panel-card">
+        <div class="panel-heading">
+          <div class="h3">Creators</div>
+        </div>
+        <div class="panel-body text-center" ng-if="!vm.ready">
+          <p>Loading</p>
+          <md-progress-linear md-mode="indeterminate" class="m-b"></md-progress-linear>
+        </div>
+        <md-tabs md-dynamic-height ng-if="vm.ready">
+          <md-tab label="Unpaid ({{vm.amountResult.creators.length}})">
+            <table class="table table-hover" ng-if="vm.ready">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>VAT Amount</th>
+                  <th>Amount</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="profile in vm.amountResult.creators | orderBy : 'profile_report.unpaid_amount' : true">
+                  <td>{{profile.contact.firstname}} {{profile.contact.surname}},
+                    <a class="text-primary" ng-click="vm.goToProfile(profile.id)">{{profile.contact.email}}</a>
+                  </td>
+                  <td>£{{profile.profile_report.unpaid_vat.toFixed(2)}}</td>
+                  <td>£{{profile.profile_report.unpaid_amount.toFixed(2)}}</td>
+                  <td>
+                    <ul class="list-inline">
+                      <li class="dropdown">
+                        <a data-toggle="dropdown" class="md-btn md-btn-circle">
+                          <i class="mdi-navigation-more-vert text-md"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-scale pull-right pull-up top text-color">
+                          <li>
+                             <a ng-click="vm.record(profile)">Record Payment</a>
+                          </li>
+                          <li ng-if="!profile.invalid">
+                            <a ng-click="vm.pay(profile)">Proceed to Payment</a>
+                          </li>
+                        </ul>
+                      </li>
+                    </ul>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </md-tab>
+          <md-tab label="Invalid Invoice ({{vm.amountResult.invalid_creators.invalid_invoicing_information.length}})">
+          <md-button class="md-raised md-primary pull-right" ng-click="vm.csvDownload(vm.amountResult.invalid_creators.invalid_invoicing_information,'Invalid Invoice')">Download CSV</md-button>
+          <table class="table table-hover" ng-if="vm.ready">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>VAT Amount</th>
+                  <th>Amount</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="profile in vm.amountResult.invalid_creators.invalid_invoicing_information | orderBy : 'profile_report.unpaid_amount' : true">
+                  <td>{{profile.contact.firstname}} {{profile.contact.surname}},  
+                    <a class="text-primary" ng-click="vm.goToProfile(profile.id)">{{profile.contact.email}}</a>
+                  </td>
+                  <td>£{{profile.profile_report.unpaid_vat.toFixed(2)}}</td>
+                  <td>£{{profile.profile_report.unpaid_amount.toFixed(2)}}</td>
+                  <td><a class="btn btn-primary" ng-click="vm.record(profile)">Record Payment</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </md-tab>
+          <md-tab label="Invalid Info ({{vm.amountResult.invalid_creators.invalid_payment_information.length}})">
+          <md-button class="md-raised md-primary pull-right" ng-click="vm.csvDownload(vm.amountResult.invalid_creators.invalid_payment_information,'Invalid Info')">Download CSV</md-button>
+          <div class="col-sm-12 "></div>
+            <table class="table table-hover" ng-if="vm.ready">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>VAT Amount</th>
+                  <th>Amount</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="profile in vm.amountResult.invalid_creators.invalid_payment_information | orderBy : 'profile_report.unpaid_amount' : true">
+                  <td>{{profile.contact.firstname}} {{profile.contact.surname}},
+                    <a class="text-primary" ng-click="vm.goToProfile(profile.id)">{{profile.contact.email}}</a>
+                  </td>
+                  <td>£{{profile.profile_report.unpaid_vat.toFixed(2)}}</td>
+                  <td>£{{profile.profile_report.unpaid_amount.toFixed(2)}}</td>
+                  <td><a class="btn btn-primary"ng-click="vm.record(profile)">Record Payment</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </md-tab>
+          <md-tab label="Update Needed ({{vm.amountResult.invalid_creators.profile_report_needs_update.length}})">
+            <table class="table table-hover" ng-if="vm.ready">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>VAT Amount</th>
+                  <th>Amount</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="profile in vm.amountResult.invalid_creators.profile_report_needs_update | orderBy : 'profile_report.unpaid_amount' : true">
+                  <td>{{profile.contact.firstname}} {{profile.contact.surname}},
+                    <a class="text-primary" ng-click="vm.goToProfile(profile.id)">{{profile.contact.email}}</a>
+                  </td>
+                  <td>£{{profile.profile_report.unpaid_vat.toFixed(2)}}</td>
+                  <td>£{{profile.profile_report.unpaid_amount.toFixed(2)}}</td>
+                  <td><a class="btn btn-primary" ng-click="vm.record(profile)">Record Payment</a></tr>
+              </tbody>
+            </table>
+          </md-tab>
+        </md-tabs>
+      </div>
+    </div>
+  </div>
+</div>
+<!--right hand side panel-->

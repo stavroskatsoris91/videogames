@@ -1,0 +1,113 @@
+<div class="row">
+  <div class="col-sm-12">
+    <div class="card">
+      <div class="card-heading">
+        <h4 class="text-center">Price Type:{{vm.pricing.expense_type}} Name: {{vm.pricing.name}} </h4>
+      </div>
+      <div class="card-body">
+        <span ng-repeat="format in vm.formatList">
+            <md-button class="md-raised md-primary" ng-click="vm.changeFormat(format)">{{format}}</md-button>            
+        </span>
+      </div>
+      <div class="card-body">
+        <span ng-repeat="recipient in vm.recipientList" ng-if='vm.pricing.expense_type === "DELIVERY"'>
+            <md-button class="md-raised md-primary" ng-click="vm.recipient_type=recipient" ng-disabled="vm.recipient_type===recipient">{{recipient}}</md-button>
+        </span>
+        <table class="table table-hover" ng-if="vm.finish">
+          <thead>
+            <tr>
+              <th>Printer</th>
+              <th>Countries</th>
+              <th>Format</th>
+              <th>Quatity From</th>
+              <th>Quatity To</th>
+              <th ng-if='vm.pricing.expense_type === "CARD"'>Price Class</th>
+              <th ng-if='vm.pricing.expense_type === "DELIVERY"'>Recipient</th>
+              <th style="min-width:160px;">Cost</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="pricing in vm.pricingByFormat" ng-if="pricing.recipient_type===vm.recipient_type||vm.recipient_type==='all'">
+              <td>{{pricing.printer}}</td>
+              <td ng-if="pricing.delivery_countries[0]==='EARTH'">
+                <div class="text-primary">{{pricing.delivery_countries[0]}}</div>
+              </td>
+              <td ng-if="pricing.delivery_countries[0]!=='EARTH'">
+                <md-button ng-if="!pricing.delivery_countries.length" class="md-raised md-primary" ng-click="vm.selectCountry(pricing)">Add</md-button>            
+                <a class="text-primary" ng-click="vm.selectCountry(pricing)">
+              {{vm.setZone(pricing.delivery_countries)}}</a>
+              </td>
+                <script type="text/ng-template" id="tabDialog.tmpl.html" passive="true">
+                  <md-dialog style="width:8000px;">
+                      <form>
+                        <md-toolbar>
+                          <div class="md-toolbar-tools">
+                            <h2>Countries</h2>
+                          </div>
+                        </md-toolbar>
+                        <md-dialog-content style="max-width:8000px;max-height:810px; ">
+                          <md-tabs>
+                            <md-tab ng-repeat="opt in vm.deliveryList" label="{{'Zone '+($index+1)}}">
+                              <md-content class="md-padding">
+                                <p>
+                                    <span> <button ng-class="vm.active(opt)" ng-click="vm.addCountry(opt)">{{'All Zone '+($index+1)}}</button><br><br></span>                                                                      
+                                  <span ng-repeat="opt2 in opt"> <button ng-class="vm.active(opt2)" ng-click="vm.addCountry(opt2)">{{opt2.display_name}}</button></span>                                  
+                                </p>
+                              </md-content>
+                            </md-tab>
+                          </md-tabs>
+                        </md-dialog-content>
+                        <md-dialog-actions layout="row">
+                          <md-button ng-click="vm.answer(false)">Cancel</md-button>
+                          <md-button ng-click="vm.answer(true)" >Confirm</md-button>
+                        </md-dialog-actions>
+                      </form>
+                    </md-dialog>
+                  </script>
+              <td>{{pricing.format}}</td>
+              <td>
+                <md-input-container style="margin-bottom : 0px">
+                  <input type="number" class="form-control" placeholder="start" ng-model="pricing.quantity_range.start" min="1"
+                  required>
+                </md-input-container>
+              </td>
+              <td>
+                <md-input-container style="margin-bottom : 0px">     
+                  <input type="number" class="form-control" placeholder="end" ng-model="pricing.quantity_range.end" min="1"
+                  required>
+                </md-input-container>
+              </td>
+              <td ng-if='vm.pricing.expense_type === "DELIVERY"'>
+                <md-input-container style="margin-bottom : 0px" ng-if='vm.recipient_type === "all"'>
+                  <label>Recipient</label>
+                  <md-select ng-model="pricing.recipient_type">
+                    <md-option ng-value="recipient" ng-repeat="recipient in vm.recipientList" ng-if="recipient!=='all'">{{recipient}}</md-option>
+                  </md-select>
+                </md-input-container>
+                <div ng-if='vm.recipient_type !== "all"'>{{pricing.recipient_type}}</div>
+              </td>
+              <td ng-if='vm.pricing.expense_type === "CARD"'>{{pricing.price_class}}
+              </td>
+              <td>
+                <md-input-container style="margin-bottom : 0px">     
+                  <input type="number" step="any" class="form-control" placeholder="£" ng-model="pricing.price.cost" min="0"
+                  required>
+                </md-input-container>
+              </td>
+              <td>
+                <a ng-click="vm.deleteRow(pricing)">
+                  <i class="fa fa-remove i-20"></i>
+                </a>
+                <a ng-click="vm.saveRow(pricing)">
+                  <i class="fa fa-save i-20"></i>
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <md-button class="md-raised md-primary" ng-click="vm.createNewRow()">Add Price</md-button>        
+      </div>
+    </div>
+  </div>
+</div>

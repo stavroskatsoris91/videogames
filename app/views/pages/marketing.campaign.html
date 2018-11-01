@@ -1,0 +1,729 @@
+<div class="row">
+  <!--left hand side panel-->
+  <div class="col-sm-4">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="panel panel-card">
+          <div class="card-heading">
+            <h2>Campaign</h2>
+          </div>
+          <div class="p">
+            Name <span class="pull-right">{{vm.campaign.name}}</span>
+          </div>
+          <div class="list-group no-radius no-border">
+            <div class="list-group-item">
+              <p>Description</p>
+              <span>{{vm.campaign.description}}</span>
+            </div>
+            <div class="list-group-item" data-toggle="collapse" data-target="#buyer">
+              <span class="pull-right">{{vm.campaign.start| date : 'dd/MM/yyyy'}} - {{vm.campaign.end| date : 'dd/MM/yyyy'}}</span>              Date
+            </div>
+            <div class="list-group-item">
+              <span class="pull-right ">
+                <span ng-if="vm.campaign.only_first_order">Only first order</span>
+                <span ng-if="!vm.campaign.only_first_order">{{vm.campaign.redemptions_per_user>=0?vm.campaign.redemptions_per_user:"Unlimited"}}</span>
+                </span> Redemption per user
+            </div>
+            <div class="list-group-item">
+              <span class="pull-right" ng-class="(vm.campaign.campaign_state==='ENABLED')?'text-success':'text-danger'">{{vm.campaign.campaign_state}}</span> Status
+            </div>
+            <div class="list-group-item" ng-if="vm.campaign.redeemer_credit">
+              <span class="pull-right">{{vm.campaign.redeemer_credit.amount}}
+                <span ng-if="!vm.campaign.redeemer_credit.amount">None</span>
+              </span>
+              Redeemer Credit
+            </div>
+          </div>
+          <div class="list-group-item" ng-if="vm.coupon">
+            <span class="pull-right">{{vm.coupon.total_elements}}</span> Coupons
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-8" ng-if="!vm.newCampaign">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="panel panel-card">
+          <div class="panel-body" ng-if="vm.loadingPage">
+            <p>Loading</p>
+            <md-progress-linear md-mode="indeterminate" class="m-b"></md-progress-linear>
+          </div>
+          <div class="panel-body" ng-if="!vm.loadingPage">
+            <span class="pull-left">
+            <ul class="nav nav-pills m-b">
+              <li class="nav-item {{vm.coupon?'active':''}}" ng-if="vm.coupon">
+                <a href data-toggle="pill" data-target="#coupon-tab">Coupons</a>
+              </li>
+              <li class="nav-item {{!vm.coupon?'active':''}}">
+                <a href data-toggle="pill" data-target="#priceRules-tab">Price Rules</a>
+              </li>
+              <li class="nav-item">
+                <a href data-toggle="pill" data-target="#editCampaign-tab">Edit Campaign</a>
+              </li>
+            </ul>
+            </span>
+            <span class="pull-right">
+            <md-button class="md-raised md-primary" ng-click="vm.stateCampaign()" ng-disabled="vm.saving">{{vm.campaign.campaign_state==="ENABLED"?"DEACTIVATE":"ACTIVATE"}}</md-button>
+            <md-button class="md-raised md-primary" ng-click="vm.saveCampaign()" ng-disabled="vm.saving">Save</md-button>            
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-content">
+      <div class="tab-pane {{vm.coupon?'active':''}}" id="coupon-tab" role="tabpanel">
+        <div class="panel panel-card" ng-if="!vm.generating">
+          <div class="panel-heading text-center">
+            <md-button class="md-raised md-primary btn-fw m-b-sm pull-left" ng-if="vm.page > 0" ng-click="vm.changePage(vm.page-1)">Prev</md-button>
+            page {{vm.page + 1}} of {{vm.coupon.total_pages}}
+            <md-button class="md-raised md-primary btn-fw m-b-sm pull-right" ng-if="vm.page != vm.coupon.total_pages - 1" ng-click="vm.changePage(vm.page+1)">Next</md-button>
+          </div>
+          <div class="panel-body">
+            <div ng-if="vm.loading">
+              <p>Loading</p>
+              <md-progress-linear md-mode="indeterminate" class="m-b"></md-progress-linear>
+            </div>
+            <table class="table table-hover" ng-if="!vm.loading">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Code</th>
+                  <th>Per User</th>
+                  <th>Use Limit</th>
+                  <th>Creator</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="coupon in vm.coupon.coupons">
+                  <td>{{coupon.name}}</td>
+                  <td>{{coupon.code}}</td>
+                  <td>{{coupon.redemptions_per_user}}</td>
+                  <td>{{coupon.global_use
+                    <0? 'UNLIMITED':(coupon.global_use===1? 'SINGLE USE':coupon.global_use)}}</td>
+                      <td>{{coupon.creator_profile_id.contact.firstname}} {{coupon.creator_profile_id.contact.surname}}</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="col-sm-4">
+              <md-input-container>
+                <input mdInput type="number" name="priority" placeholder="Start" ng-model="vm.csvStart" min="0" ng-disabled="vm.downloading">
+              </md-input-container>
+            </div>
+            <div class="col-sm-4">
+              <md-input-container>
+                <input mdInput type="number" name="priority" placeholder="End" ng-model="vm.csvEnd" ng-disabled="vm.downloading">
+              </md-input-container>
+            </div>
+            <div class="col-sm-4">
+              <md-button class="md-raised md-primary" ng-click="vm.massiveCsv()"
+              ng-disabled="vm.downloading">Download Coupon CSV</md-button>
+            </div>
+            <div class="col-sm-6">            
+              <div ng-if="vm.downloading" class="progress progress-striped active">
+                <div class="progress-bar progress-bar-info" ng-style="{'width':vm.percentage+'%'}">{{vm.percentage}}%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="panel panel-card" ng-if="!vm.generating">
+          <form name="myForm" ng-submit="vm.addCoupon(name,code,perUser,useLimit)" class="form-horizontal form-validation">
+            <div class="panel-heading bg-white">
+              <strong>Create Coupon</strong>
+            </div>
+            <div class="panel-body">
+              <div  class="col-sm-3">
+                <md-input-container>
+                  <input mdInput placeholder="Name" ng-model="name" required>
+                  <div ng-messages="myForm.$error" role="alert">
+                    <div ng-message="required">
+                        Required Field
+                    </div>
+                  </div>
+                </md-input-container>
+              </div>
+              <div  class="col-sm-3">
+                <md-input-container>
+                  <input mdInput placeholder="coupons code" ng-model="code" required>
+                  <div ng-messages="myForm.$error" role="alert">
+                    <div ng-message="required">
+                        Required Field
+                    </div>
+                  </div>
+                </md-input-container>
+              </div>
+              <div  class="col-sm-3">
+                <md-input-container>
+                  <input mdInput type="number" placeholder="Per User" ng-model="perUser" min="1" required>
+                  <div ng-messages="myForm.$error" role="alert">
+                    <div ng-message="required">
+                        Required Field
+                    </div>
+                    <div ng-message="min">
+                        can not be less than 1
+                    </div>
+                  </div>
+                </md-input-container>
+              </div>
+              <div  class="col-sm-3">
+                <md-input-container>
+                  <label>Use Limit</label>
+                  <md-select ng-model="useLimit" required>
+                    <md-option value="1">SINGLE USE</md-option>
+                    <md-option value="-1">UNLIMITED</md-option>
+                  </md-select>
+                  <div ng-messages="myForm.$error" role="alert">
+                      <div ng-message="required">
+                          Required Field
+                      </div>
+                    </div>
+                </md-input-container>
+              </div>
+              <md-button type="submit" class="md-raised md-primary btn-fw m-b-sm pull-right" ng-disabled="myForm.$error.validator||myForm.$error.required">ADD</md-button>
+            </div>
+          </form>
+        </div>
+        <div class="panel panel-card" >
+          <div class="panel-body text-center" ng-if="vm.generating">
+            <p>Creating coupons...</p>
+            <md-progress-linear md-mode="indeterminate" class="m-b"></md-progress-linear>
+          </div>
+          <form name="myForm2" ng-submit="vm.generateCoupons(mName,mPerUser,mUseLimit,mLength,mQuantity)" class="form-horizontal form-validation" ng-if="!vm.generating">
+            <div class="panel-heading bg-white">
+              <strong>Generate Multiple Coupons</strong>
+            </div>
+            <div class="panel-body">
+              <div class="col-sm-3">
+                <md-input-container>
+                  <input mdInput placeholder="Name" ng-model="mName" md-minlength="3" required>
+                  <div ng-messages="myForm2.$error" role="alert">
+                    <div ng-message="required">
+                        Required Field
+                    </div>
+                    <div ng-message="md-minlength">
+                        Add at least 3 characters
+                    </div>
+                  </div>
+                </md-input-container>
+              </div>
+              <div class="col-sm-2">
+                <md-input-container>
+                  <input mdInput type="number" placeholder="Per User" ng-model="mPerUser" min="1" required>
+                  <div ng-messages="myForm2.$error" role="alert">
+                    <div ng-message="required">
+                        Required Field
+                    </div>
+                    <div ng-message="min">
+                        can not be less than 1
+                    </div>
+                  </div>
+                </md-input-container>
+              </div>
+              <div class="col-sm-3">
+                <md-input-container>
+                  <label>Use Limit</label>
+                  <md-select ng-model="mUseLimit" required>
+                    <md-option value="1">SINGLE USE</md-option>
+                    <md-option value="-1">UNLIMITED</md-option>
+                  </md-select>
+                  <div ng-messages="myForm2.$error" role="alert">
+                      <div ng-message="required">
+                          Required Field
+                      </div>
+                    </div>
+                </md-input-container>
+              </div>
+              <div class="col-sm-2">
+                <md-input-container>
+                  <input mdInput type="number" placeholder="Length" ng-model="mLength" min="3" required>
+                  <div ng-messages="myForm2.$error" role="alert">
+                    <div ng-message="required">
+                        Required Field
+                    </div>
+                    <div ng-message="min">
+                        can not be less than 3
+                    </div>
+                  </div>
+                </md-input-container>
+              </div>
+              <div class="col-sm-2">
+                <md-input-container>
+                  <input mdInput type="number" placeholder="Quantity" ng-model="mQuantity" min="1" required>
+                  <div ng-messages="myForm2.$error" role="alert">
+                    <div ng-message="required">
+                        Required Field
+                    </div>
+                    <div ng-message="min">
+                        can not be less than 1
+                    </div>
+                  </div>
+                </md-input-container>
+              </div>
+              <md-button type="submit" class="md-raised md-primary btn-fw m-b-sm pull-right" ng-disabled="myForm2.$error.validator||myForm2.$error.min||myForm2.$error.required">GENERATE</md-button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="tab-pane {{!vm.coupon?'active':''}}" id="priceRules-tab" role="tabpanel">
+        <div class="panel panel-card">
+          <div class="panel-heading h4">Price Rules</div>
+          <div class="panel-body">
+            <div class="col-sm-6">
+              Rule Type: <strong>{{vm.campaign.discount_rule.price_rule_filter_type}}</strong>
+            </div>
+            <div class="col-sm-6">
+              Price Type: <strong>{{vm.campaign.discount_rule.price_rule_type}}</strong>
+            </div>
+          </div>
+        </div>
+        <div class="panel panel-card">
+          <div class="panel-body">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th ng-if="vm.campaign.discount_rule.price_rule_type==='DISCOUNT_AMOUNT'">Discount amount</th>
+                  <th ng-if="vm.campaign.discount_rule.price_rule_type==='NEW_PRICE'">New price</th>
+                  <th ng-if="vm.campaign.discount_rule.price_rule_type==='PERCENTAGE_OFF'">Percentage off</th>
+                  <th ng-if="vm.campaign.discount_rule.price_rule_filter_type==='PRODUCT_VALUE'">Min value</th>
+                  <th ng-if="vm.campaign.discount_rule.price_rule_filter_type==='PRODUCT_QUANTITY'">Min cards</th>
+                  <th ng-if="vm.campaign.discount_rule.price_rule_filter_type==='PRODUCT_QUANTITY'">Max card</th>
+                  <th>Suggestion Trigger</th>
+                </tr>
+              </thead>
+              <tbody class="text-center form-validation">
+                <tr ng-repeat="rule in vm.campaign.discount_rule.price_rules">
+                  <td ng-if="vm.campaign.discount_rule.price_rule_type==='DISCOUNT_AMOUNT'">
+                    <div class="input-group">
+                      <span class="input-group-addon">£</span>
+                      <input type="number" step="any" class="form-control" ng-model="rule.discount_amounts[0].amount" ui-validate=" '$value >= 0' " required>
+                    </div>
+                  </td>
+                  <td ng-if="vm.campaign.discount_rule.price_rule_type==='NEW_PRICE'">
+                    <div class="input-group">
+                      <span class="input-group-addon">£</span>
+                      <input type="number" step="any" class="form-control" ng-model="rule.new_prices[0].amount" ui-validate=" '$value >= 0' " required>
+                    </div>
+                  </td>
+                  <td ng-if="vm.campaign.discount_rule.price_rule_type==='PERCENTAGE_OFF'">
+                    <div class="input-group">
+                      <input type="number" class="form-control" ng-model="rule.percentage_off" ui-validate=" '$value >= 0' " required>
+                      <span class="input-group-addon">%</span>
+                    </div>
+                  </td>
+                  <td ng-if="vm.campaign.discount_rule.price_rule_filter_type==='PRODUCT_VALUE'">
+                    <div class="input-group">
+                      <span class="input-group-addon">£</span>
+                      <input type="number" step="any" class="form-control" ng-model="rule.min_products_value" ui-validate=" '$value >= 0' " required>
+                    </div>
+                  </td>
+                  <td ng-if="vm.campaign.discount_rule.price_rule_filter_type==='PRODUCT_QUANTITY'">
+                    <input type="number" class="form-control" ng-model="rule.min_card_number" ui-validate=" '$value >= 0' " required>
+                  </td>
+                  <td ng-if="vm.campaign.discount_rule.price_rule_filter_type==='PRODUCT_QUANTITY'">
+                    <input type="number" class="form-control" ng-model="rule.max_card_number" ui-validate=" '$value > rule.min_card_number' "
+                      required>
+                  </td>
+                  <td>
+                    <input type="number" class="form-control" ng-model="rule.show_suggestion_trigger" ui-validate=" '$value >= 0' " required>
+                  </td>
+                  <td><a ng-click=vm.removePriceRule($index)><i class="fa fa-remove"></i></a></td>
+                </tr>
+              </tbody>
+            </table>
+            <md-button class="md-raised md-primary btn-fw m-b-sm pull-right" ng-click="vm.addPriceRule()">ADD</md-button>
+          </div>
+        </div>
+      </div>
+      <div class="tab-pane" id="editCampaign-tab" role="tabpanel" ng-if="vm.campaign">
+        <form name="campaign" class="form-horizontal">
+          <div class="form-group">
+            <div class="col-md-6">
+              <div class="panel panel-card">
+                <div class="panel-heading h3">Main</div>
+                <div class="panel-body">
+                  <div class="row">
+                    <div class="form-group">
+                      <div class="col-xs-4">
+                        <label>Name</label>
+                      </div>
+                      <div class="col-xs-8">
+                        <input type="text" class="form-control" placeholder="Name" ng-model="vm.campaign.name" required>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <div class="col-xs-4">
+                        <label>Description</label>
+                      </div>
+                      <div class="col-xs-8">
+                        <textarea class="form-control" placeholder="Description" ng-model="vm.campaign.description" required></textarea>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="panel panel-card">
+                <div class="panel-heading h3">Date</div>
+                <div class="panel-body">
+                  <div class="row">
+                    <div class="form-group">
+                      <div class="col-xs-2">
+                        <label>Start</label>
+                      </div>
+                      <div class="col-xs-10">
+                        <input type="date" class="form-control" placeholder="Name" ng-model="vm.campaign.start" required>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <div class="col-xs-2">
+                        <label>End</label>
+                      </div>
+                      <div class="col-xs-10">
+                        <input type="date" class="form-control" placeholder="Name" ng-model="vm.campaign.end" required>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-md-6">
+              <div class="panel panel-card">
+                <div class="panel-heading h3">Discount Type</div>
+                <div class="panel-body">
+                  <div class="row">
+                    <div>
+                      <md-input-container>
+                        <label>{{vm.campaign.discount_rule.discount_target}}</label>
+                        <md-select ng-model="vm.campaign.discount_rule.discount_target" required>
+                          <md-option value="PRODUCT">PRODUCT</md-option>
+                          <md-option value="DELIVERY">DELIVERY</md-option>
+                          <md-option value="ORDER">ORDER</md-option>
+                        </md-select>
+                        <div ng-messages="campaign.$error" role="alert">
+                            <div ng-message="required">
+                                Required Field
+                            </div>
+                          </div>
+                        </md-input-container>
+                    </div>
+                    <div class="form-group">
+                      <div class="col-xs-4">
+                        <label>Only first order</label>
+                      </div>
+                      <div class="col-xs-8">
+                        <input type="checkbox" class="form-control" ng-model="vm.campaign.only_first_order">
+                      </div>
+                    </div>
+                    <div class="form-group" ng-if="!vm.campaign.only_first_order">
+                      <div class="col-xs-4">
+                        <label>Redemption per user</label>
+                      </div>
+                      <div class="col-xs-8">
+                        <input type="number" class="form-control" placeholder="Name" ng-model="vm.campaign.redemptions_per_user" ui-validate=" '$value >= 1' "
+                          required>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6" ng-if="vm.campaign.redeemer_credit">
+              <div class="panel panel-card">
+                <div class="panel-heading h3">Redeemer Credit</div>
+                <div class="panel-body">
+                  <div class="form-group">
+                    <label>Credit Amount</label>
+                    <input type="number" class="form-control" placeholder="Credits" ng-model="vm.campaign.redeemer_credit.amount" ui-validate=" '$value >= 1' "
+                      required>
+                  </div>
+                  <div class="form-group">
+                    <md-input-container>
+                      <label>Redemption per user</label>
+                      <md-select ng-model="vm.redeemerType" required>
+                        <md-option value="Days Ahead">Days Ahead</md-option>
+                        <md-option value="Expiry Date">Expiry Date</md-option>
+                        <md-option value="Yearly">Yearly</md-option>
+                      </md-select>
+                      <div ng-messages="campaign.$error" role="alert">
+                        <div ng-message="required">
+                            Required Field
+                        </div>
+                      </div>
+                    </md-input-container>
+                  </div>
+                  <span ng-if="vm.redeemerType==='Days Ahead'">
+                  <div class="form-group">
+                    <label>Days Ahead</label>
+                    <input type="number" class="form-control" placeholder="Name" ng-model="vm.campaign.redeemer_credit.days_ahead" ui-validate=" '$value >= 1' " required>
+                  </div>
+                </span>
+                  <span ng-if="vm.redeemerType==='Expiry Date'">
+                  <div class="form-group">
+                    <label>Expiry Date</label>
+                    <input type="date" class="form-control" ng-model="vm.campaign.redeemer_credit.expiry_date">
+                  </div>
+                </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-md-12">
+              <div class="panel panel-card">
+                <div class="panel-heading h3">Filters</div>
+                <div class="panel-body">
+                  <div class="form-group">
+                    <div class="col-sm-4">
+                      <label>Categories</label>
+                    </div>
+                    <div class="col-sm-8">
+                      <md-autocomplete md-no-cache="true" md-selected-item-change="vm.selectCategory(item)" md-items="item in vm.categoryList| filter :vm.searchText"
+                        md-search-text="vm.searchText" md-item-text="item.title">
+                        <span>{{ item.title }}</span>
+                      </md-autocomplete>
+                    </div>
+                  </div>
+                  <div class="col-sm-12">
+                    <span ng-repeat="category in vm.selectedCategories"> <a class="btn btn-primary" ng-click="vm.removeCategory(category)">{{category.title}}</a>
+                      </span>
+                  </div>
+                </div>
+                <div class="panel-body">
+                  <div class="form-group">
+                    <div class="col-sm-4">
+                      <label>Creators</label>
+                    </div>
+                    <div class="col-sm-8">
+                      <md-autocomplete md-no-cache="true" md-selected-item-change="vm.selectCreatorFilter(item)" md-items="item in vm.searchCreators()"
+                        md-search-text="vm.searchText2" md-item-text="item.contact.firstname">
+                        <span>{{ item.contact.firstname}} {{ item.contact.surname }} {{item.contact.email}}</span>
+                      </md-autocomplete>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="col-sm-12">
+                      <span ng-repeat="creator in vm.selectedCreators"> <a class="btn btn-primary" ng-click="vm.removeCreator(creator)">{{creator.contact.firstname}} {{creator.contact.surname}} {{creator.contact.email}}</a>
+                        </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="panel-body">
+                  <div class="form-group">
+                    <md-input-container>
+                      <label>Format</label>
+                      <md-select ng-model="vm.campaign.discount_rule.card_filter.printer_format" required>
+                        <md-option ng-value="format" ng-repeat="format in vm.formats">{{format}}</md-option>
+                      </md-select>
+                      <div ng-messages="campaign.$error" role="alert">
+                        <div ng-message="required">
+                            Required Field
+                        </div>
+                      </div>
+                    </md-input-container>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="tab-pane" id="action-tab" role="tabpanel">
+        <div class="panel panel-card">
+          <div class="panel-heading h3">
+          </div>
+          <div class="panel-body">
+          </div>
+        </div>
+      </div>
+      <div class="tab-pane" id="sales-tab" role="tabpanel">
+        <div class="panel panel-card">
+          <div class="panel-heading h3">
+          </div>
+          <div class="panel-body">
+            <h3>Total card sales: {{vm.totalSales}}</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-8" ng-if="vm.newCampaign">
+    <form name="newCampaign" class="row" ng-submit="vm.createCampaign()">
+      <div class="col-sm-12">
+        <div class="panel panel-card">
+          <div class="panel-body">
+            <form class="form-horizontal form-validation">
+              <div class="form-group">
+                <div class="col-sm-6">
+                  <label> Name</label>
+                  <input type="text" class="form-control" placeholder="Name" ng-model="vm.campaign.name" required>
+                </div>
+                <div class="col-sm-6">
+                  <label> Description</label>
+                  <textarea class="form-control" placeholder="Description" ng-model="vm.campaign.description" required></textarea>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="col-sm-6">
+                  <md-input-container>
+                    <label>Rule Type</label>
+                    <md-select ng-model="vm.campaign.discount_rule.price_rule_filter_type" ng-change="vm.createPriceRule()"required>
+                      <md-option value="PRODUCT_VALUE">PRODUCT VALUE</md-option>
+                      <md-option value="PRODUCT_QUANTITY">PRODUCT QUANTITY</md-option>
+                    </md-select>
+                    <div ng-messages="newCampaign.$error" role="alert">
+                      <div ng-message="required">
+                          Required Field
+                      </div>
+                    </div>
+                  </md-input-container>
+                </div>
+                <div class="col-sm-6">
+                  <md-input-container>
+                    <label>Price type</label>
+                    <md-select ng-model="vm.campaign.discount_rule.price_rule_type"  ng-change="vm.createPriceRule()" required>
+                      <md-option value="DISCOUNT_AMOUNT">DISCOUNT AMOUNT</md-option>
+                      <md-option value="NEW_PRICE">NEW PRICE</md-option>
+                      <md-option value="PERCENTAGE_OFF">PERCENTAGE OFF</md-option>
+                    </md-select>
+                    <div ng-messages="newCampaign.$error" role="alert">
+                      <div ng-message="required">
+                          Required Field
+                      </div>
+                    </div>
+                  </md-input-container>
+                </div>
+              </div>
+              <div class="form-group" ng-if="vm.campaign.discount_rule.price_rules.length">
+                <table class="table table-hover">
+                  <thead>
+                    <tr>
+                      <th ng-if="vm.campaign.discount_rule.price_rule_type==='DISCOUNT_AMOUNT'">Discount amount</th>
+                      <th ng-if="vm.campaign.discount_rule.price_rule_type==='NEW_PRICE'">New price</th>
+                      <th ng-if="vm.campaign.discount_rule.price_rule_type==='PERCENTAGE_OFF'">Percentage off</th>
+                      <th ng-if="vm.campaign.discount_rule.price_rule_filter_type==='PRODUCT_VALUE'">Min value</th>
+                      <th ng-if="vm.campaign.discount_rule.price_rule_filter_type==='PRODUCT_QUANTITY'">Min cards</th>
+                      <th ng-if="vm.campaign.discount_rule.price_rule_filter_type==='PRODUCT_QUANTITY'">Max card</th>
+                      <th>Suggestion Trigger</th>
+                    </tr>
+                  </thead>
+                  <tbody class="text-center form-validation">
+                    <tr ng-repeat="rule in vm.campaign.discount_rule.price_rules">
+                      <td ng-if="vm.campaign.discount_rule.price_rule_type==='DISCOUNT_AMOUNT'">
+                        <div class="input-group">
+                          <span class="input-group-addon">£</span>
+                          <input type="number" step="any" class="form-control" ng-model="rule.discount_amounts[0].amount" ui-validate=" '$value >= 0' " required>
+                        </div>
+                      </td>
+                      <td ng-if="vm.campaign.discount_rule.price_rule_type==='NEW_PRICE'">
+                        <div class="input-group">
+                          <span class="input-group-addon">£</span>
+                          <input type="number" step="any" class="form-control" ng-model="rule.new_prices[0].amount" ui-validate=" '$value >= 0' " required>
+                        </div>
+                      </td>
+                      <td ng-if="vm.campaign.discount_rule.price_rule_type==='PERCENTAGE_OFF'">
+                        <div class="input-group">
+                          <input type="number" class="form-control" ng-model="rule.percentage_off" ui-validate=" '$value >= 0' " required>
+                          <span class="input-group-addon">%</span>
+                        </div>
+                      </td>
+                      <td ng-if="vm.campaign.discount_rule.price_rule_filter_type==='PRODUCT_VALUE'">
+                        <div class="input-group">
+                          <span class="input-group-addon">£</span>
+                          <input type="number" step="any" class="form-control" ng-model="rule.min_products_value" ui-validate=" '$value >= 0' " required>
+                        </div>
+                      </td>
+                      <td ng-if="vm.campaign.discount_rule.price_rule_filter_type==='PRODUCT_QUANTITY'">
+                        <input type="number" class="form-control" ng-model="rule.min_card_number" ui-validate=" '$value >= 0' " required>
+                      </td>
+                      <td ng-if="vm.campaign.discount_rule.price_rule_filter_type==='PRODUCT_QUANTITY'">
+                        <input type="number" class="form-control" ng-model="rule.max_card_number" ui-validate=" '$value > rule.min_card_number' "
+                          required>
+                      </td>
+                      <td>
+                        <input type="number" class="form-control" ng-model="rule.show_suggestion_trigger" ui-validate=" '$value >= 0' " required>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>          
+              </div>
+              <div class="form-group">
+                <div class="col-sm-6">
+                  <label> Start Date</label>
+                  <input type="date" class="form-control" placeholder="Name" ng-model="vm.campaign.start" required>
+                </div>
+                <div class="col-sm-6">
+                  <label> End Date</label>
+                  <input type="date" class="form-control" placeholder="Name" ng-model="vm.campaign.end" required>
+                </div>
+              </div>
+              <div class="form-group" ng-if="vm.campaign.redeemer_credit">
+                <div class="col-sm-4">
+                  <label>Redeemer Credit Amount</label>
+                  <input type="number" class="form-control" placeholder="Credits" ng-model="vm.campaign.redeemer_credit.amount" ui-validate=" '$value >= 1' "
+                    required>
+                </div>
+                <div class="col-sm-4">
+                  <md-input-container>
+                    <label>Redeemer Credits</label>
+                    <md-select ng-model="vm.redeemerType" required>
+                      <md-option value="Days Ahead">Days Ahead</md-option>
+                      <md-option value="Expiry Date">Expiry Date</md-option>
+                      <md-option value="Yearly">Yearly</md-option>
+                    </md-select>
+                    <div ng-messages="newCampaign.$error" role="alert">
+                      <div ng-message="required">
+                          Required Field
+                      </div>
+                    </div>
+                  </md-input-container>
+                </div>
+                    <span ng-if="vm.redeemerType==='Days Ahead'">
+                    <div class="col-sm-4">
+                      <label>Days Ahead</label>
+                      <input type="number" class="form-control" placeholder="Days" ng-model="vm.campaign.redeemer_credit.days_ahead" ui-validate=" '$value >= 1' " required>
+                    </div>
+                  </span>
+                    <span ng-if="vm.redeemerType==='Expiry Date'">
+                    <div class="col-sm-4">
+                      <label>Expiry Date</label>
+                      <input type="date" class="form-control" ng-model="vm.campaign.redeemer_credit.expiry_date">
+                    </div>
+                  </span>
+              </div>
+              <div class="form-group">
+                <div class="col-sm-4">
+                  <md-input-container>
+                    <label>Discount type</label>
+                    <md-select ng-model="vm.campaign.discount_rule.discount_target" required>
+                      <md-option value="PRODUCT">PRODUCT</md-option>
+                      <md-option value="DELIVERY">DELIVERY</md-option>
+                      <md-option value="ORDER">ORDER</md-option>
+                    </md-select>
+                    <div ng-messages="newCampaign.$error" role="alert">
+                      <div ng-message="required">
+                          Required Field
+                      </div>
+                    </div>
+                  </md-input-container>
+                </div>
+                <div class="col-sm-4">
+                  <label>Only first order</label>
+                  <input type="checkbox" class="form-control" ng-model="vm.campaign.only_first_order">
+                </div>
+                <div class="col-sm-4" ng-if="!vm.campaign.only_first_order">
+                  <label> Reddemption per User</label>
+                  <input type="number" class="form-control" ng-model="vm.campaign.redemptions_per_user" ui-validate=" '$value >= 1' " required>
+                </div>
+              </div>
+              <md-button class="md-raised md-primary pull-right" type="submit">Create Campaign</md-button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<!--right hand side panel-->

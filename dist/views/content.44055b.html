@@ -1,0 +1,33 @@
+<div class="box">
+  <div class="navbar md-whiteframe-z1 no-radius" ng-class="$state.current.data.theme ? $state.current.data.theme.primary : app.setting.theme.primary">
+    <!-- <a md-ink-ripple ng-click="openAside()" ng-hide="$state.current.data.child" class="navbar-item pull-left visible-xs visible-sm"><i class="mdi-navigation-menu i-24"></i></a> -->
+    <!-- <a md-ink-ripple class="navbar-item pull-left" ng-click="goBack()" ng-show="$state.current.data.child" ><i class="mdi-navigation-arrow-back i-24"></i></a> -->
+    <div class="navbar-item pull-left h4" >Stavros Katsoris</div>
+    <!-- <div class="navbar-item pull-left h4" ng-bind="$state.current.data.title"></div> -->
+    <ul class="nav nav-sm navbar-tool" ng-hide="$state.current.data.child">
+      <li>
+        <div class="navbar-item h4">Page 1</div>
+        <!-- <a md-ink-ripple ng-click="app.search.show = true">
+          <i class="mdi-action-search i-24"></i>
+        </a> -->
+      </li>
+      <li>
+        <div class="navbar-item h4" >Page 2</div>
+        <!-- <a md-ink-ripple data-toggle="dropdown">
+          <i class="mdi-navigation-more-vert i-24"></i>
+        </a> -->
+        <!-- <ul class="dropdown-menu dropdown-menu-scale pull-right pull-up text-color">
+          <li><a href>This isn't the droid you are looking for</a></li>
+          <li><a href>Help &amp; feedback</a></li>
+        </ul> -->
+      </li>
+    </ul>
+    <div class="pull-right" ui-view="navbar@"></div>
+  </div>
+  <!-- <div class="box-row">
+    <div class="box-cell">
+      <div class="box-inner padding" ui-view id="view">
+      </div>
+    </div>
+  </div> -->
+</div>

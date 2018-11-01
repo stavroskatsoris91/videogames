@@ -1,0 +1,79 @@
+<div class="row" dates-selector date-type="vm.dateType" to-date="vm.toDate" from-date="vm.fromDate" group-by="vm.groupBy" hide-group="true" remove-amazon="true" callback="vm.reload()">
+</div>
+<div class="row">
+  <div class="col-lg-12">
+    <div class="panel">
+      <div class="panel-body">
+        <md-button class="md-raised btn-fw m-b-sm" ng-repeat="filter in vm.filterList" ng-click="vm.changeFilter(filter.param)" ng-class="{'md-primary' : vm.filter[filter.param]}" ng-disabled="vm.loading">{{filter.name}}  <i ng-if="vm.filter[filter.param]" class="fa" ng-class="{'fa-caret-down':vm.filter[filter.param]=='DESC','fa-caret-up':vm.filter[filter.param]=='ASC'}"></i></md-button>
+      </div>
+    </div>
+  </div>  
+</div>
+<div class="row" ng-if="vm.searchList.total_pages > 0">
+  <div class="col-lg-12">
+    <div class="panel">
+      <div class="panel-body text-center">
+        <div class="pull-left col-xs-12 col-md-5">
+          <md-button class="md-raised md-primary btn-fw m-b-sm pull-left" ng-if="vm.page > 0" ng-click="vm.changePage(0)">First</md-button>
+          <md-button class="md-raised md-primary btn-fw m-b-sm pull-left" ng-if="vm.page > 0" ng-click="vm.changePage(vm.page-1)">Prev</md-button>
+        </div>
+        <div class="col-xs-12 col-md-2">
+          <form ng-submit="vm.changePage(vm.text-1)">
+            page <input type="text" ng-model="vm.text" style="width:40px">of {{vm.searchList.total_pages}}
+          </form>  
+        </div>
+        <div class="pull-right col-xs-12 col-md-5">
+          <md-button class="md-raised md-primary btn-fw m-b-sm  pull-right" ng-if="vm.page != vm.searchList.total_pages - 1" ng-click="vm.changePage(vm.searchList.total_pages-1)">Last</md-button> 
+          <md-button class="md-raised md-primary btn-fw m-b-sm  pull-right" ng-if="vm.page != vm.searchList.total_pages - 1" ng-click="vm.changePage(vm.page+1)">Next</md-button> 
+        </div>
+       </div>
+    </div>
+  </div>
+</div>
+<div class="row" ng-if="vm.loading">
+  <div class="col-sm-6 col-md-offset-3">
+    <div class="panel panel-card">
+      <div class="panel-body text-center">
+        <p>Loading</p>
+        <md-progress-linear md-mode="indeterminate" class="m-b"></md-progress-linear>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-xs-6 col-sm-4 col-md-4 col-lg-3" ng-repeat="card in vm.searchList.content track by card.id">
+     <div class="panel panel-card">
+        <div class="item text-center" style="min-height: 214px;">
+          <a ui-sref="cards.card({cardId: card.id})">
+            <img ng-src="{{card.image.small}}" class="r-t" style="max-height:100%;max-width:100%" border="3">            
+          </a>
+        </div>
+        <div class="list-group no-radius no-border">
+          <div class="list-group-item">
+            <div>ID <span class="pull-right ng-binding">{{card.id}}</span></div>
+          </div>
+          <div class="list-group-item">
+            <div>Rating <span class="pull-right ng-binding">{{card.global_moderator_rank}}</span></div>
+          </div>
+          <div class="list-group-item">
+            <div>Sales <span class="pull-right ng-binding">{{card.card_report?card.card_report.total_sales:0}}</span></div>
+          </div>
+          <div class="list-group-item">
+            <div>By 
+              <span class="pull-right ng-binding">
+                <a ui-sref="users.profile({profileId: card.creator.id})" class="text-info">
+                  <span ng-repeat="owner in card.classification.owner_fields track by $index">{{owner}} </span> 
+                </a>
+              </span>
+            </div>
+          </div>
+          <div class="list-group-item">
+            <div>Creation time <span class="pull-right ng-binding">{{card.created_at | date : 'MMM d, y HH:mm'}}</span></div>
+          </div>
+          <div class="list-group-item">
+            <div>Last Updated <span class="pull-right ng-binding">{{card.last_updated | date : 'MMM d, y HH:mm'}}</span></div>
+          </div>
+        </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,25 @@
+<div class="row" dates-selector date-type="vm.dateType" to-date="vm.toDate" from-date="vm.fromDate" group-by="vm.groupBy" occasion="vm.category" callback="vm.load()">
+</div>
+<div class="row">
+  <div class="col-xs-3 col-sm-2" ng-repeat="category in vm.topSelling">
+    <div class="panel panel-card">
+      <div class="item">
+        <a ui-sref="cards.card({cardId: category.card.id})">
+          <img ng-src="{{category.card.image.small}}" class="w-full r-t" style="height:120px">
+        </a>
+      </div>
+      <div class="p">
+        <i class="icon mdi-action-shopping-cart i-12"></i><small>{{category.quantity}}</small>
+        <a data-toggle="collapse" class="pull-right" ng-if="category.group"ng-click="vm.collapseNext($event);">
+          <i class="icon mdi-navigation-expand-more"></i>
+        </a>
+        <div class="collapse">
+          <br>
+          <div ng-repeat="group in category.group">
+              <span class="pull-right ">{{group.quantity}}</span> {{group.category_name}}              
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

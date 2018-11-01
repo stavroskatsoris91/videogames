@@ -1,0 +1,42 @@
+<div class="row">
+  <div class="col-sm-12">
+    <div class="card">
+      <md-tabs md-dynamic-height md-border-bottom md-swipe-content>
+        <md-tab label="{{key}}" ng-repeat="(key,item) in vm.list">
+          <md-content>
+            <div class="card-body">
+              <div class="h4">
+                Search: <input type="text" ng-model="vm.test">
+                <span class="pull-right">
+                  <md-button class="md-raised md-primary" ng-click="vm.newItem(key.slice(0,key.length-1))">New {{key.slice(0,key.length-1)}}</md-button>
+                </span>
+              </div>
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th ng-if="key2=='label'||key2=='tag'||key2=='filter_group_id'||key2=='title'||key2=='filters'||key2=='position'" ng-click="vm.active(key2)" ng-repeat="(key2,item2) in item[0]">{{key2}}<i ng-class="vm.arrow(key2)"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-repeat="filter in item | filter: vm.test | orderBy : vm.selected : vm.reverse" ng-click="vm.openDialog(filter)">
+                    <td ng-if="key2=='label'||key2=='tag'||key2=='filter_group_id'||key2=='title'||key2=='filters'||key2=='position'" ng-repeat="(key2,item2) in filter">
+                      <span ng-if="key2=='filters'">
+                          <span ng-repeat="filter in item2">
+                            {{filter.label+' '}}
+                          </span>
+                        </span>
+                      <span ng-if="key2=='filter_group_id'">{{vm.getFilterGroupName(item2)}}</span>
+                      <span ng-if="key2!='filter_group_id'&&key2!='filters'">
+                          {{item2}}
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </md-content>
+        </md-tab>
+      </md-tabs>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,260 @@
+<div class="row">
+  <div class="col-lg-12">
+    <div class="panel">
+      <div class="panel-body">
+        <md-button class="md-raised md-primary btn-fw m-b-sm pull-left" ng-click="vm.changeFilter()">ALL</md-button> 
+        <md-button class="md-raised md-primary btn-fw m-b-sm pull-left" ng-click="vm.changeFilter('PRINTING_ERROR')">Printing Error</md-button> 
+        <md-button class="md-raised md-primary btn-fw m-b-sm pull-left" ng-click="vm.changeFilter('UNFIT_FOR_PRINT')">Unfit for Print</md-button> 
+        <md-button aria-label="refresh"class="md-icon-button md-primary" ng-click="vm.refreshSearch()" ng-disabled="vm.loading">
+          <i class="fa fa-refresh i-20" ng-class="{'fa-spin': vm.loading}"></i>
+        </md-button>
+        <md-select ng-model="vm.selectedFilter" ng-change="vm.changeFilter(vm.selectedFilter)" placeholder="More Filters" class="no-margin pull-right">
+          <md-option ng-repeat="status in vm.filterList" value="{{status}}">{{status}}</md-option>
+        </md-select>
+        <md-select ng-model="vm.format" ng-change="vm.searchByFormat()" placeholder="Format" class="no-margin pull-right" style="padding-right: 25px;">
+          <md-option ng-repeat="format in vm.formats" value="{{format}}">{{format}}</md-option>
+        </md-select>
+      </div>
+    </div>
+  </div>  
+</div>
+<nav ui-nav>
+  <ul class="nav">
+    <li ng-class="{active:vm.searchBy}">
+      <a md-ink-ripple class="h3">
+        <span class="pull-right text-muted">
+          <i class="fa fa-caret-down"></i>
+        </span>
+        <i class="pull-right up"></i>
+        <span class="font-normal">Search By</span>
+      </a>
+      <div class="nav-sub">
+          <div class="col-md-4">
+            <div class="panel">
+              <div class="card-heading">
+                <h2>Proco ID</h2>
+                <small>Used to identify an order with Proco</small>
+              </div>
+              <div class="panel-body text-center">
+                  <form ng-submit="vm.searchByProcoId()">
+                    <div class="form-group">
+                      <div class="input-group">
+                        <input type="text" name="search" class="form-control" ng-model="vm.procoId" placeholder="Proco ID">
+                        <md-button class="md-raised md-primary btn-fw m-b-sm pull-right" ng-click="vm.searchByProcoId()">Search</md-button> 
+                      </div>
+                    </div>
+                  </form>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="panel">
+              <div class="card-heading">
+                <h2>Proco Item ID</h2>
+                <small>Printed on the back of every card</small>
+              </div>
+              <div class="panel-body text-center">
+                  <form ng-submit="vm.searchByProcoId()">
+                    <div class="form-group">
+                      <div class="input-group">
+                        <input type="text" name="search" class="form-control" ng-model="vm.procoItemId" placeholder="Item ID">
+                        <md-button class="md-raised md-primary btn-fw m-b-sm pull-right" ng-click="vm.searchByProcoItemId()">Search</md-button> 
+                      </div>
+                    </div>
+                  </form>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="panel">
+              <div class="card-heading">
+                <h2>Customer ID</h2>
+                <small>Sent to customers by email</small>
+              </div>
+              <div class="panel-body text-center">
+                  <form ng-submit="vm.searchByProcoId()">
+                    <div class="form-group">
+                      <div class="input-group">
+                        <input type="text" name="search" class="form-control" ng-model="vm.customerId" placeholder="Customer ID">
+                        <md-button class="md-raised md-primary btn-fw m-b-sm pull-right" ng-click="vm.searchByCustomerId()">Search</md-button> 
+                      </div>
+                    </div>
+                  </form>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="panel">
+              <div class="card-heading">
+                <h2>Transaction ID</h2>
+                <small>Paypal or Stripe</small>
+              </div>
+              <div class="panel-body text-center">
+                  <form ng-submit="vm.searchByTransactionId()">
+                    <div class="form-group">
+                      <div class="input-group">
+                        <input type="text" name="search" class="form-control" ng-model="vm.transactionId" placeholder="Transaction ID">
+                        <md-button class="md-raised md-primary btn-fw m-b-sm pull-right" ng-click="vm.searchByTransactionId()">Search</md-button> 
+                      </div>
+                    </div>
+                  </form>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="panel">
+              <div class="card-heading">
+                <h2>Address</h2>
+                <small>Recipient or/and PostCode</small>
+              </div>
+              <div class="panel-body text-center">
+                <form ng-submit="vm.searchByAddress()">
+                  <div class="form-group">
+                    <input type="text" name="name" class="form-control" ng-model="vm.recipient" placeholder="Recipient Name">
+                  </div>
+                </form>
+                <form ng-submit="vm.searchByAddress()">
+                  <div class="form-group">
+                    <input type="text" name="address" class="form-control" ng-model="vm.postcode" placeholder="Recipient Postcode">
+                  </div>
+                </form>
+                <md-button class="md-raised md-primary btn-fw m-b-sm pull-right" ng-click="vm.searchByAddress()">Search</md-button>
+              </div>
+            </div>
+          </div>
+        </div>
+    </li>
+  </ul>
+</nav>
+<div class="row" ng-if="vm.searchList.total_pages > 1">
+  <div class="col-lg-12">
+    <div class="panel">
+      <div class="panel-body text-center">
+        <div class="pull-left col-xs-12 col-md-5">
+          <md-button class="md-raised md-primary btn-fw m-b-sm pull-left" ng-if="vm.page > 0" ng-click="vm.changePage(0)">First</md-button>
+          <md-button class="md-raised md-primary btn-fw m-b-sm pull-left" ng-if="vm.page > 0" ng-click="vm.changePage(vm.page-1)">Prev</md-button>
+        </div>
+        <div class="col-xs-12 col-md-2">
+          <form ng-submit="vm.changePage(vm.text-1)">
+            page <input type="text" ng-model="vm.text" style="width:40px">of {{vm.searchList.total_pages}}
+          </form>  
+        </div>
+        <div class="pull-right col-xs-12 col-md-5">
+          <md-button class="md-raised md-primary btn-fw m-b-sm  pull-right" ng-if="vm.page != vm.searchList.total_pages - 1" ng-click="vm.changePage(vm.searchList.total_pages-1)">Last</md-button> 
+          <md-button class="md-raised md-primary btn-fw m-b-sm  pull-right" ng-if="vm.page != vm.searchList.total_pages - 1" ng-click="vm.changePage(vm.page+1)">Next</md-button> 
+        </div>
+       </div>
+    </div>
+  </div>
+</div>
+<div class="row" ng-if="vm.loading">
+  <div class="col-sm-6 col-md-offset-3">
+    <div class="panel panel-card">
+      <div class="panel-body text-center">
+        <p>Loading</p>
+        <md-progress-linear md-mode="indeterminate" class="m-b"></md-progress-linear>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- No Result -->
+<div class="row" ng-if="vm.searchList.total_pages == 0 && !vm.loading">
+  <div class="col-sm-6 col-md-offset-3">
+    <div class="panel panel-card">
+      <div class="panel-body text-center">
+        <p>No order found</p>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Result -->
+<div class="row">
+  <div class="col-md-12"> 
+    <div class="md-list md-whiteframe-z0 bg-white m-b" ng-if="vm.searchList.total_pages > 0&&!vm.loading">
+      <div class="md-list-item btn-default" ng-repeat="result in vm.searchList.orders">
+        <a  ui-sref="users.order({orderId: result.id})">
+          <div class="row">
+            <div class="col-sm-2 col-md-2 col-lg-1">
+              <span ng-if="vm.hasMore(result.cards)" class="badge badge-lg" style="position : absolute">+{{vm.hasMore(result.cards)}}</span>
+              <img ng-src="{{result.cards[0].image.medium}}" class="w-full">
+            </div>
+            <div class="col-sm-10 col-md-10 col-lg-11">
+              <div class="row">
+                <div class="h4">{{result.cards[0].format}} <strong ng-class="vm.changeColor(result.status,'text')">{{result.status}}</strong></div>
+                <div class="col-sm-4">
+                  <div>
+                    <small class="font-thin">Price: </small><small>{{result.costs.final_cost| currency : '£'}}</small>
+                    <i ng-if="result.payment_method_type==='PAYPAL'" class="fa text-primary i-20 fa-cc-paypal"></i>
+                    <i ng-if="result.payment_method_type!=='PAYPAL'" class="fa text-primary i-20 fa-cc-stripe"></i>
+                  </div>
+                  <div>
+                    <small class="font-thin">Discount: </small><small ng-if="result.costs.discount_amount">{{result.costs.discount_amount | currency : '£'}}</small><small ng-if="!result.costs.discount_amount">- </small>
+                    <small ng-if="result.costs.credits_used"><small class="font-thin">Credits Used: </small>{{result.costs.credits_used}}</small>
+                    <small ng-if="result.costs.discount_campaign_name"><small class="font-thin">Coupon Used: </small>{{result.costs.discount_campaign_name}}</small>
+                  </div>
+                  <div>
+                    <small class="font-thin">Date: </small><small>{{result.created | date : 'd/M/yy HH:mm:ss'}}</small>
+                    <!--<small class="font-thin">Last Update: </small><small>{{result.last_updated |  | date : mediumDate}}}}</small>-->
+                  </div>
+                  <!-- <div>
+                    <md-button class="md-raised md-warn" ng-if="false" ng-click="vm.moderate()">Unmoderated</md-button>
+                  </div> -->
+                </div>
+                <div class="col-sm-4">
+                  <div>
+                    <strong>From</strong>
+                    <div ng-repeat="report in vm.buyerName(result.buyer_id)">
+                        <small ng-class="$index!==0?'font-thin':''">{{report.split(':')[0]}}</small>
+                        <small>{{report.split(':')[1]}}</small>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-4">
+                  <div>
+                    <strong>To</strong><br>
+                    <small>{{result.delivery_address.recipient}}</small>
+                    <small class="font-thin"> {{result.recipient_type}}</small>
+                  </div>
+                  <div>
+                    <small>{{result.delivery_address.city}},{{result.delivery_address.country}}</small>
+                  </div>
+                  <div>
+                    <small class="font-thin">Dispatch: </small><small>{{result.order_delivery.dispatch_type}}</small>
+                    <small class="font-thin" ng-if="result.order_delivery.requested_arrival_date">Requested Date: </small><small>{{result.order_delivery.requested_arrival_date| date : "d/M/yy"}}</small>
+                  </div>
+                  <div>
+                    <small class="font-thin">Arrival Date: </small><small>{{result.order_delivery.estimated_earliest_arrival_date | date : "d/M/yy"}}</small>
+                  </div>
+                  <div>
+                    <small class="font-thin" ng-if="result.order_delivery.requested_arrival_date">Requested Date: </small><small>{{result.order_delivery.requested_arrival_date | date : "d/M/yy"}}</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row" ng-if="vm.searchList.total_pages > 1 &&!vm.loading">
+  <div class="col-lg-12">
+    <div class="panel">
+      <div class="panel-body text-center">
+        <div class="pull-left col-xs-12 col-md-5">
+          <md-button class="md-raised md-primary btn-fw m-b-sm pull-left" ng-if="vm.page > 0" ng-click="vm.changePage(0)">First</md-button>
+          <md-button class="md-raised md-primary btn-fw m-b-sm pull-left" ng-if="vm.page > 0" ng-click="vm.changePage(vm.page-1)">Prev</md-button>
+        </div>
+        <div class="col-xs-12 col-md-2">
+          <form ng-submit="vm.changePage(vm.text-1)">
+            page <input type="text" ng-model="vm.text" style="width:40px">of {{vm.searchList.total_pages}}
+          </form>  
+        </div>
+        <div class="pull-right col-xs-12 col-md-5">
+          <md-button class="md-raised md-primary btn-fw m-b-sm  pull-right" ng-if="vm.page != vm.searchList.total_pages - 1" ng-click="vm.changePage(vm.searchList.total_pages-1)">Last</md-button> 
+          <md-button class="md-raised md-primary btn-fw m-b-sm  pull-right" ng-if="vm.page != vm.searchList.total_pages - 1" ng-click="vm.changePage(vm.page+1)">Next</md-button> 
+        </div>
+       </div>
+    </div>
+  </div>
+</div>

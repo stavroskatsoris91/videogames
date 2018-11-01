@@ -1,0 +1,37 @@
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-sm-12">
+      <h3>Reports</h3>
+  </div>  
+</div>
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-sm-12">
+    <div class="card">
+      <div class="card-heading">
+        <h2>Stats</h2>
+        <small>Download CSV</small>
+      </div>
+      <div class="card-body"> 
+        <div>
+          <md-button class="md-raised md-primary btn-fw m-b-sm" ng-click="vm.profileStats()" ng-disabled="vm.loading">Profiles</md-button>
+          Download a list of all profile stats in CSV format.
+        </div>
+        <div>
+          <md-button class="md-raised md-primary btn-fw m-b-sm" ng-click="vm.orderStats()" ng-disabled="vm.loading">Orders</md-button>
+          Download a list of all order stats in CSV format.
+        </div>
+        <div>
+          <md-button class="md-raised md-primary btn-fw m-b-sm" ng-click="vm.cardStats()" ng-disabled="vm.loading">Cards</md-button>
+          Download a list of all cards stats in CSV format.
+        </div>
+        <div class="p" ng-if="vm.loading">
+          <p>Loading
+            <a ng-click="vm.cancel()">
+              <i class="fa fa-close i-20"></i>
+            </a>
+          </p>
+          <md-progress-linear md-mode="indeterminate" class="m-b"></md-progress-linear>
+        </div>
+      </div>
+    </div>
+  </div>  
+</div>

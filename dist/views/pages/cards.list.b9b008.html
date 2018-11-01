@@ -1,0 +1,73 @@
+<div class="row">
+  <div class="col-lg-12">
+    <div class="panel">
+      <div class="panel-body">
+        <md-button class="md-primary btn-fw m-b-sm" ng-click="vm.changeFilter(vm.filterList[0])" ng-class="{'md-raised' : vm.filter!=vm.filterList[0]}" ng-disabled="vm.loading">ALL</md-button> 
+        <md-button class="md-primary btn-fw m-b-sm" ng-click="vm.changeFilter(vm.filterList[1])" ng-class="{'md-raised' : vm.filter!=vm.filterList[1]}" ng-disabled="vm.loading">Unmoderated</md-button> 
+        <md-button class="md-primary btn-fw m-b-sm" ng-click="vm.changeFilter(vm.filterList[4])" ng-class="{'md-raised' : vm.filter!=vm.filterList[4]}" ng-disabled="vm.loading">Replacement</md-button>
+        <span class="pull-right">
+          <md-button class="md-primary btn-fw m-b-sm" ng-click="vm.changeFilter(vm.filterList[2])" ng-class="{'md-raised' : vm.filter2=='false'||!vm.filter2}" ng-disabled="vm.loading">Retired</md-button> 
+          <md-button class="md-primary btn-fw m-b-sm" ng-click="vm.changeFilter(vm.filterList[3])" ng-class="{'md-raised' : vm.filter3=='false'||!vm.filter3}" ng-disabled="vm.loading">Ordered</md-button>
+        </span>
+      </div>
+    </div>
+  </div>  
+</div>
+<div class="row" ng-if="vm.searchList.total_pages > 0">
+  <div class="col-lg-12">
+    <div class="panel">
+      <div class="panel-body text-center">
+        <div class="pull-left col-xs-12 col-md-5">
+          <md-button class="md-raised md-primary btn-fw m-b-sm pull-left" ng-if="vm.page > 0" ng-click="vm.changePage(0)">First</md-button>
+          <md-button class="md-raised md-primary btn-fw m-b-sm pull-left" ng-if="vm.page > 0" ng-click="vm.changePage(vm.page-1)">Prev</md-button>
+        </div>
+        <div class="col-xs-12 col-md-2">
+          <form ng-submit="vm.changePage(vm.text-1)">
+            page <input type="text" ng-model="vm.text" style="width:40px">of {{vm.searchList.total_pages}}
+          </form>  
+        </div>
+        <div class="pull-right col-xs-12 col-md-5">
+          <md-button class="md-raised md-primary btn-fw m-b-sm  pull-right" ng-if="vm.page != vm.searchList.total_pages - 1" ng-click="vm.changePage(vm.searchList.total_pages-1)">Last</md-button> 
+          <md-button class="md-raised md-primary btn-fw m-b-sm  pull-right" ng-if="vm.page != vm.searchList.total_pages - 1" ng-click="vm.changePage(vm.page+1)">Next</md-button> 
+        </div>
+       </div>
+    </div>
+  </div>
+</div>
+<div class="row" ng-if="vm.loading">
+  <div class="col-sm-6 col-md-offset-3">
+    <div class="panel panel-card">
+      <div class="panel-body text-center">
+        <p>Loading</p>
+        <md-progress-linear md-mode="indeterminate" class="m-b"></md-progress-linear>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-xs-6 col-sm-4 col-md-4 col-lg-3" ng-repeat="card in vm.searchList.cards">
+     <div class="panel panel-card">
+        <div class="item text-center" ng-click="vm.nextCard(card.id,$index)" >
+          <a ui-sref="cards.card({cardId: card.id})">
+            <img ng-src="{{card.image.small}}" class="r-t" style="max-height:100%;max-width:100%" border="3">            
+          </a>
+        </div>
+        <div class="text-center" ng-if="card.moderation.status==='AWAITING_REVIEW'">
+          <md-button  class="md-raised md-primary" ng-disabled="vm.loadingApprove" ng-click="vm.approveCard(card)">Approve ({{card.visibility}})</md-button>
+        </div>
+        <div class="p">
+          <div>Tags: {{card.classification.tags.length}}</div>
+          <div>Categories: {{card.classification.category_names.length}}</div>
+          <div>Visibility: {{card.visibility}}</div>
+          <div>Status: {{card.moderation.status}}</div>
+          <div>Rating: {{card.global_moderator_rank}}</div>
+          <div>By: <a ui-sref="users.profile({profileId: card.creator.id})" class="text-info">
+            <span ng-repeat="owner in card.classification.owner_fields track by $index">{{owner}} </span> </a>
+          </div>
+          <div>Creation time: {{card.created_at | date : 'MMM d, y HH:mm'}}</div>
+          <div>Last Updated: {{card.last_updated | date : 'MMM d, y HH:mm'}}</div>
+          <div>ID: {{card.id}}</div>
+      </div>
+    </div>
+  </div>
+</div>

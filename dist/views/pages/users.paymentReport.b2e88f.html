@@ -1,0 +1,75 @@
+<div class="row">
+  <!--left hand side panel-->
+  <div class="col-sm-12">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="panel panel-card">
+          <div class="card-heading">
+            <h2>Payment Report</h2>
+          </div>
+          <form name="date" class="text-center">
+            <md-input-container>
+              <label>Month</label>                        
+              <md-select ng-model="vm.month" name="month" ng-disabled="vm.loading">
+                <md-option ng-repeat="(index,month) in vm.months" ng-value="index" ng-disabled="(vm.year==vm.today.getFullYear()&&index>vm.today.getMonth())?true:false">{{month}}</md-option>
+              </md-select>
+              <div ng-messages="date.month.$error" role="alert">
+                <div ng-message="required">Required field</div>
+              </div>
+            </md-input-container>
+            <md-input-container>
+              <label>Year</label>                        
+              <md-select ng-model="vm.year" name="year" ng-change="vm.month=(vm.year==vm.today.getFullYear()&&vm.month>vm.today.getMonth())?vm.today.getMonth():vm.month" ng-disabled="vm.loading">
+                <md-option ng-repeat="year in vm.years" ng-value="year">{{year}}</md-option>
+              </md-select>
+              <div ng-messages="date.year.$error" role="alert">
+                <div ng-message="required">Required field</div>
+              </div>
+            </md-input-container>
+            <md-button  class="md-raised md-primary" ng-click="vm.reload()" ng-disabled="vm.loading">Find</md-button>
+            <md-button  class="md-raised md-primary" ng-if="vm.csv" ng-click="vm.csvDownload()" ng-disabled="vm.loading">Download CSV</md-button>
+          </form>
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Email</th>
+                <th>Vat_number</th>
+                <th>Net</th>
+                <th>Vat</th>
+                <th>Gross</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="profile in vm.report track by $index">
+                <td>{{vm.toDate(profile.date) | date : 'dd/MM/yyyy'}}</td>
+                <td>{{profile.email}}</td>
+                <td>{{profile.vat_number}}</td>
+                <td>{{profile.net}}</td>
+                <td>{{profile.vat}}</td>
+                <td>{{profile.gross}}</td>
+                <!-- <td>
+                  <ul class="list-inline">
+                    <li class="dropdown">
+                      <a data-toggle="dropdown" class="md-btn md-btn-circle">
+                        <i class="mdi-navigation-more-vert text-md"></i>
+                      </a>
+                      <ul class="dropdown-menu dropdown-menu-scale pull-right pull-up top text-color">
+                        <li>
+                           <a ng-click="vm.record(profile)">Record Payment</a>
+                        </li>
+                        <li ng-if="!profile.invalid">
+                          <a ng-click="vm.pay(profile)">Proceed to Payment</a>
+                        </li>
+                      </ul>
+                    </li>
+                  </ul>
+                </td> -->
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

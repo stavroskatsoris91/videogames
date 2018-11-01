@@ -1,0 +1,236 @@
+<div class="row">
+
+  <div class="col-sm-12 text-right">
+    <md-button class="md-raised md-primary" ng-click="vm.createGroup()">Create Group</md-button>
+  </div>
+  <div class="col-sm-12">
+    <div class="col-sm-4" ng-repeat="group in vm.groups| orderBy:'rank'">
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="panel panel-card">
+            <div class="card-heading">
+              <div class="card-tools">
+                <ul class="list-inline pull-right">
+                  <li class="dropdown">
+                    <a ng-click="vm.editGroup(group)" class="md-btn md-flat md-btn-circle">
+                      <i class="mdi-editor-mode-edit text-md"></i>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+              <h2>{{group.label}}</h2>
+            </div>
+            <div class="p">
+              <span>{{group.description}}</span>
+            </div>
+            <div class="list-group no-radius no-border">
+              <a class="list-group-item" data-toggle="collapse" ng-click="vm.collapseNext($event);">
+                <div><span class="pull-right">{{group.category_search_queries.length}}</span> Categories</div>
+              </a>
+              <div class="collapse">
+                <md-content>
+                  <md-list flex>
+                    <md-list-item ng-repeat="query in group.category_search_queries| orderBy:'rank'" class="dropdown">
+                        <span class="pull-left badge bg-primary">{{query.rank}}</span><img ng-src="{{query.search_image.medium}}" class="md-avatar"alt="..."/>
+                      <div class="md-list-item-text" layout="column">
+                        <p>{{query.label}}</p>
+                      </div>
+                        <md-button class="md-secondary md-icon-button" md-ink-ripple data-toggle="dropdown" aria-label="menu">
+                            <md-icon class="mdi-navigation-more-vert text-md"></md-icon>
+                          </md-button>
+                        <ul class="md-secondary dropdown-menu dropdown-menu-scale pull-right pull-up top text-color">
+                          <li><a ng-click="vm.editGroup(query)">Edit</a></li>
+                          <li><a ng-click="vm.deleteQuery(query,group)">Delete</a></li>
+                        </ul>
+                    </md-list-item>
+                    <md-list-item>
+                      <md-button class="md-raised md-primary btn-fw m-b-sm" ng-click="vm.createCategory(group)">New</md-button>
+                    </md-list-item>
+                  </md-list>
+                </md-content>
+              </div>
+            </div>
+            <div class="list-group-item">
+              <span class="badge">{{group.rank}}</span> Rank
+            </div>
+            <div class="list-group-item">
+              <span class="pull-right ">{{group.group_level}}</span> Level
+            </div>
+            <div class="list-group-item">
+              <span class="pull-right" ng-class="group.enable_category_search?'text-success':'text-danger'">{{group.enable_category_search?"Enabled":"Disabled"}}</span> Status
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="col-sm-12">
+  <div class="card">
+    <div class="card-heading text-center">
+      <h2>Preview</h2>
+    </div>
+    <a>
+      <div class="p b-b-4x inline text-capitalize" ng-class="vm.selectedTab[0]" ng-mouseleave="vm.colourLeave(0)" ng-mouseover="vm.colourOver(0)" ng-click="vm.colour(0)">
+        All Occasions
+      </div>
+    </a>
+    <div id="collapse" class="collapse" ng-class="vm.isOpen()" style="padding: 0px 15px;">
+        <ul class="nav nav-pills m-b">
+            <li class="nav-item"ng-repeat="group in vm.groups| orderBy:'rank'" ng-if="group.enable_category_search">
+                <div class="p">  
+                  <div class="b-b-2x b-b b-b-light" style="color:teal">
+                    <p>{{group.label.toUpperCase()}}</p>
+                  </div>
+                </div>
+                <div class="p-h">
+                  <ul class="nav m-b text-capitalize">
+                      <li ng-repeat="query in group.category_search_queries| orderBy:'rank'" style="padding-bottom:10px">
+                      {{query.label}}
+                      </li>
+                  </ul>
+                </div>
+            </li>
+        </ul>
+    </div>
+  </div>
+</div>
+</div>
+<script type="text/ng-template" id="GroupDialog.tmpl.html" passive="true">
+  <md-dialog style="width:8000px;">
+    <form name="groupForm"  ng-submit="vm.answer(true)">
+      <md-toolbar>
+        <div class="md-toolbar-tools">
+          <h2>{{vm.ev.category_search_group_id?'Query':'Group'}}</h2>
+        </div>
+      </md-toolbar>
+      <md-dialog-content style="max-width:8000px;max-height:810px; ">
+          <md-tabs ng-if="!vm.ev.category_search_group_id">
+          <md-tab label="Main">
+            <md-content class="md-padding">
+              <div>
+                <md-input-container>
+                  <input mdInput placeholder="Label" ng-model="vm.ev.label">
+                </md-input-container>
+                <md-input-container ng-if="!vm.ev.category_search_group_id">
+                  <input mdInput placeholder="Description" ng-model="vm.ev.description">
+                </md-input-container>
+              </div>
+              <div>
+                <md-input-container>
+                  <input mdInput type="number" name="rank" placeholder="Rank" ng-model="vm.ev.rank" min="0">
+                  <div ng-messages="groupForm.rank.$error" role="alert">
+                      <div ng-message="min">
+                        Rank can not be less than 0
+                      </div>
+                    </div>
+                </md-input-container>
+                <md-input-container>
+                  <md-checkbox ng-model="vm.ev.enable_category_search">Enable</md-checkbox>
+                </md-input-container>
+              </div>
+            </md-content>
+          </md-tab>
+        </md-tabs>
+        <md-tabs ng-if="vm.ev.category_search_group_id">
+          <md-tab label="Main">
+            <md-content class="md-padding">
+              <p>
+                <md-input-container>
+                  <input mdInput placeholder="Label" ng-model="vm.ev.label">
+                </md-input-container>
+                <md-input-container>
+                    <input mdInput type="number" name="rank" placeholder="Rank" ng-model="vm.ev.rank" min="0">
+                    <div ng-messages="groupForm.$error" role="alert">
+                        <div ng-message="min">
+                            Rank can not be less than 0
+                          </div>
+                      </div>
+                  </md-input-container>
+              </p>
+            </md-content>
+          </md-tab>
+          <md-tab label="Image">
+            <md-content class="md-padding">
+              <p>
+                  <div class="col-xs-2" ng-if="vm.ev.search_image">
+                    <img class="img-responsive" ng-src="{{vm.ev.search_image?vm.ev.search_image.medium:''}}">
+                  </div>
+                  <div class="col-xs-3">
+                      <input type="file" file-input="vm.image" id="image_file" onchange="angular.element(this).scope().vm.loadImage()">
+                      <md-button class="md-raised md-primary btn-fw m-b-sm" ng-if="vm.ev.id" ng-disabled="!vm.image" ng-click="vm.updateImage(vm.ev)">Update</md-button>
+                  </div>
+                  <div class="col-xs-2">
+                      <img class="img-responsive" id="output">
+                  </div>
+              </p>
+            </md-content>
+          </md-tab>
+          <md-tab label="Categories">
+            <md-content class="md-padding">
+              <p>
+                <div class="col-sm-3">
+                  <label>Categories</label>
+                </div>
+                <div class="col-sm-9">
+                  <md-autocomplete md-no-cache="true" md-selected-item-change="vm.addItem(item.id,vm.ev.criteria_search.categories)" md-items="item in vm.categoryList| filter :vm.text.category"
+                    md-search-text="vm.text.category" md-item-text="item.title">
+                    <span>{{ item.title }}</span>
+                  </md-autocomplete>
+                </div>
+                <p>
+                  <span ng-repeat="category in vm.ev.criteria_search.categories"> <button class="btn-primary"ng-click="vm.removeItem(category,vm.ev.criteria_search.categories)">{{vm.categoryTitle(category)}}</button></span>
+                </p>
+            </md-content>
+          </md-tab>
+          <md-tab label="Tags">
+            <md-content class="md-padding">
+              <p>
+                <div class="col-sm-3">
+                  <label>Tags</label>
+                </div>
+                <div class="col-sm-9">
+                  <div class="input-group">
+                    <input type="text" class="form-control" ng-model="vm.text.tag" placeholder="add a Tag">
+                    <span class="input-group-btn">
+                      <button type="button" class="btn btn-primary" ng-click="vm.addItem(vm.text.tag.toLowerCase(),vm.ev.criteria_search.tags)">Add</button>
+                    </span>
+                  </div>
+                </div>
+                <p>
+                  <span ng-repeat="tag in vm.ev.criteria_search.tags"> <button class="btn-primary"ng-click="vm.removeItem(tag,vm.ev.criteria_search.tags)">{{tag}}</button></span>
+                </p>
+            </md-content>
+          </md-tab>
+          <md-tab label="Keywords">
+            <md-content class="md-padding">
+              <p>
+                <div class="col-sm-3">
+                  <label>Keywords</label>
+                </div>
+                <div class="col-sm-9">
+                  <div class="input-group">
+                    <input type="text" class="form-control" ng-model="vm.text.keyword" placeholder="add a keyword">
+                    <span class="input-group-btn">
+                      <button type="button" class="btn btn-primary" ng-click="vm.addItem(vm.text.keyword.toLowerCase(),vm.ev.criteria_search.keywords)">Add</button>
+                    </span>
+                  </div>
+                </div>
+                <p>
+                  <span ng-repeat="keyword in vm.ev.criteria_search.keywords"> <button class="btn-primary"ng-click="vm.removeItem(keyword,vm.ev.criteria_search.keywords)">{{keyword}}</button></span>
+                </p>
+            </md-content>
+          </md-tab>
+        </md-tabs>
+      </md-dialog-content>
+      <md-dialog-actions layout="row">
+          <div ng-messages="groupForm.$error" role="alert" class="text-danger">
+            <div ng-message="min">Rank can not be less than 0</div>
+          </div>
+          <div ng-if="vm.ev.category_search_group_id&&!(vm.image||vm.ev.id)"class="text-danger">Please add an image</div>
+        <md-button ng-click="vm.answer(false)">Cancel</md-button>
+        <md-button ng-click="vm.answer(true)" ng-disabled="vm.ev.category_search_group_id&&!(vm.image||vm.ev.id)">Confirm</md-button>
+      </md-dialog-actions>
+    </form>
+  </md-dialog>
+</script>

@@ -1,0 +1,205 @@
+<div class="row">
+  <div class="col-sm-4">
+    <div class="panel panel-card">
+      <div class="card-heading">
+        <h2>Grey Envelopes</h2>
+        <small>THORTFUL_ENV_GREY</small>
+      </div>
+      <div class="panel-body text-center">
+        <div class="m-v-lg">
+          <div class="h1 {{vm.greyEnvelopes>0?'text-success':'text-warning'}} font-bold">{{vm.greyEnvelopes}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="panel panel-card">
+      <div class="card-heading">
+        <h2>Grey Envelopes Notebook</h2>
+        <small>THORTFUL_ENV_GREY_WALLET_KEEPSAKE</small>
+      </div>
+      <div class="panel-body text-center">
+        <div class="m-v-lg">
+          <div class="h1 {{vm.greyEnvelopesLarge>0?'text-success':'text-warning'}} font-bold">{{vm.greyEnvelopesLarge}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="panel panel-card">
+      <div class="card-heading">
+        <h2>Do Not Bend up to 3</h2>
+        <small>THORTFUL_DNBEND_1-2</small>
+      </div>
+      <div class="panel-body text-center">
+        <div class="m-v-lg">
+          <div class="h1 {{vm.doNotBendSmall>0?'text-success':'text-warning'}} font-bold">{{vm.doNotBendSmall}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-4">
+    <div class="panel panel-card">
+      <div class="card-heading">
+        <h2>Do Not Bend up to 6</h2>
+        <small>THORTFUL_ENV_MANILLA</small>
+      </div>
+      <div class="panel-body text-center">
+        <div class="m-v-lg">
+          <div class="h1 {{vm.doNotBendLarge>0?'text-success':'text-warning'}} font-bold">{{vm.doNotBendLarge}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="panel panel-card">
+      <div class="card-heading">
+        <h2>C4 large</h2>
+        <small>THORTFUL_ENV_GREY_HB_C4</small>
+      </div>
+      <div class="panel-body text-center">
+        <div class="m-v-lg">
+          <div class="h1 {{vm.c4Large>0?'text-success':'text-warning'}} font-bold">{{vm.c4Large}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="panel panel-card">
+      <div class="card-heading">
+        <h2>Variable e flute</h2>
+        <small>THORTFUL_EFLUTE</small>
+      </div>
+      <div class="panel-body text-center">
+        <div class="m-v-lg">
+          <div class="h1 {{vm.eFlute>0?'text-success':'text-warning'}} font-bold">{{vm.eFlute}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-4">
+    <div class="panel panel-card">
+      <div class="card-heading">
+        <h2>Card parcel(19+)</h2>
+        <small>THORTFUL_BOX_A5</small>
+      </div>
+      <div class="panel-body text-center">
+        <div class="m-v-lg">
+          <div class="h1 {{vm.boxA5>0?'text-success':'text-warning'}} font-bold">{{vm.boxA5}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="panel panel-card">
+      <div class="card-heading">
+        <h2>Notebook Mailer</h2>
+        <small>THORTFUL_NOTEBOOK_CARDBOARD_ENVELOPE</small>
+      </div>
+      <div class="panel-body text-center">
+        <div class="m-v-lg">
+          <div class="h1 {{vm.notebookEnv>0?'text-success':'text-warning'}} font-bold">{{vm.notebookEnv}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="panel panel-card">
+      <div class="card-heading">
+        <h2>Notebook parcel</h2>
+        <small>THORTFUL_NOTEBOOK_SMALL_PARCEL</small>
+      </div>
+      <div class="panel-body text-center">
+        <div class="m-v-lg">
+          <div class="h1 {{vm.smallParcel>0?'text-success':'text-warning'}} font-bold">{{vm.smallParcel}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-lg-12">
+    <div class="card">
+      <div class="card-heading">
+        <h2>Options Stock Level</h2>
+        <small>All individual things we add to orders</small>
+      </div>
+      <div class="card-body">
+        <table class="table table-striped">
+          <thead>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Stock</th>
+          </thead>
+          <tbody>
+            <tr ng-repeat="item in vm.itemOptionStock | orderBy : 'target' : -1">
+              <td>{{item.name}}</td>
+              <td>{{item.target}}</td>
+              <td>{{item.stock}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-lg-12">
+    <div class="card">
+      <div class="card-heading">
+        <h2>Dispatch Later Cards</h2>
+        <small>All Cards from Dispatch Later Orders</small>
+      </div>
+      <div class="card-body">
+        <table class="table table-striped">
+          <thead>
+            <th>Format</th>
+            <th>Items</th>
+            <th>Stock</th>
+          </thead>
+          <tbody>
+            <tr ng-repeat="item in vm.pendingStock">
+              <td>{{item.format}}</td>
+              <td>{{item.item_option_name}}</td>
+              <td>{{item.stock}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- <div class="row" ng-if="vm.shipmentPerDay.length > 0">
+  <div class="col-lg-12 col-md-12 col-sm-12">
+    <div class="card">
+      <div class="card-heading">
+        <h2>Shipments per Day</h2>
+        <small>All individual (all format) shipments per day</small>
+      </div>
+      <div class="card-body"> 
+        <div ui-jp="plot" ui-options="
+          [
+            {
+              data : {{vm.shipmentPerDay}},
+              bars: { show: true, fill: true,  barWidth: 24 * 60 * 60 * 1000*0.8, lineWidth: 1, order: 1, fillColor: { colors: [{ opacity: 0.5 }, { opacity: 0.9}] }}
+            }
+          ], 
+          {
+            colors: ['{{app.color.primary}}','{{app.color.success}}'],
+            series: { shadowSize: 3 },
+            xaxis: { show: true, timezone: null, timeformat: '%d %b %y',font: { color: '#ccc' }, position: 'bottom',mode : 'time'},
+            yaxis:{ show: true, font: { color: '#ccc' }},
+            grid: { hoverable: true, clickable: true, borderWidth: 0, color: '#ccc' },
+            tooltip: true,
+            tooltipOpts: { content: '%x : %y.0',  defaultTheme: false, shifts: { x: 0, y: -40 } }
+          }
+        " style="height:220px" ui-refresh="vm.shipmentPerDay">
+        </div>
+      </div>
+    </div>
+  </div>  
+</div> -->

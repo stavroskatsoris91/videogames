@@ -1,0 +1,28 @@
+<div class="row">
+  <div class="col-lg-12">
+    <div class="panel">
+      <div class="panel-heading">
+        Available options for cards / orders
+      </div>
+      <div class="panel-body">
+        <table class="table table-striped">
+          <thead>
+            <th>Name</th>
+            <th>Format</th>
+            <th>Target</th>
+            <th>Current Stock</th>
+          </thead>
+          <tbody>
+            <tr ng-repeat="option in vm.options" ui-sref="cards.option({optionId: option.id})">
+              <td>{{option.name}}</td>
+              <td>{{option.printer_format}}</td>
+              <td>{{option.target}}</td>
+              <td>{{option.stock}}</td>
+            </tr>
+          </tbody>
+        </table>
+        <div> <a ui-sref="cards.optionsCreate">Create</a></div>
+      </div>
+    </div>
+  </div>
+</div>

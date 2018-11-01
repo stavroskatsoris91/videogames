@@ -1,0 +1,29 @@
+<div class="row">
+  <div class="col-xs-12">
+    <div class="panel panel-card">
+      <div class="card-heading">
+        <h2>Templates</h2>
+        <small>HTML templates for product images (Google product / FB retargeting / alternative images)</small>
+      </div>
+      <div class="panel-body">
+        <table class="table table-striped">
+          <thead>
+            <th>Name</th>
+            <th>Size</th>
+            <th>Linked item</th>
+            <th>Orientation</th>
+          </thead>
+          <tbody>
+            <tr ng-repeat="artwork in vm.artworkList.data" ng-if="artwork.type == 'CARD_MARKETING'" ui-sref="cards.image({templateId: artwork.id})">
+              <td ng-if="artwork.name">{{artwork.name}}</td>
+              <td ng-if="!artwork.name">No Name</td>
+              <td>{{artwork.page_width}}x{{artwork.page_height}}</td>
+              <td>{{artwork.item_option_id}}</td>
+              <td>{{artwork.card_orientation}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

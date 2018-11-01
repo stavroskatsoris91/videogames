@@ -1,0 +1,411 @@
+<div ng-if="!vm.stateId">
+  <div class="row" dates-selector date-type="vm.dateType"to-date="vm.toDate" from-date="vm.fromDate" group-by="vm.groupBy" callback="vm.reload()" remove-amazon="true"></div>
+  <div class="row">
+    <div class="col-sm-4" ng-repeat="item in vm.items">
+      <div class="panel panel-card">
+        <div class="card-heading">
+          <h2>
+            <a ng-click="vm.changeStatus(item)">
+              <i ng-class="['fa',{'fa-circle text-success':item.enabled===true},{'fa-circle-o text-danger':item.enabled===false}]"></i>
+            </a>
+            {{item.name}}
+          </h2>
+          <small>{{item.printer_name}}</small>
+        </div>
+        <div class="card-tools">
+          <ul class="list-inline">
+            <li class="dropdown">
+                <button md-ink-ripple data-toggle="dropdown" class="md-btn md-flat md-btn-circle">
+                  <i class="mdi-navigation-more-vert text-md"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-scale pull-right pull-up top text-color">
+                  <li>
+                    <a ng-click="vm.editItem(item)">Edit</a>
+                  </li>
+                  <li>
+                    <a ng-click="vm.deleteDialog(item)">Delete</a>
+                  </li>
+                </ul>
+              </li>
+          </ul>
+        </div>
+        <div class="panel-body text-center">
+          <div class="m-v-lg">
+            <div class="h1 {{item.stock>0?'text-success':'text-warning'}} font-bold">{{item.quantity?item.quantity:0}}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <md-button ng-if="!criteria.id" ng-click="vm.editItem({id:'new'})" class="btn btn-primary">New Package</md-button>      
+    </div>
+  </div>
+  <div class="row">
+      <div class="col-lg-12">
+      <div class="card">
+        <div class="card-heading">
+          <h2>Options Stock Level</h2>
+          <small>All individual things we add to orders</small>
+        </div>
+        <div class="card-body"> 
+          <table class="table table-striped">
+            <thead>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Stock</th>
+            </thead>
+            <tbody>
+              <tr ng-repeat="item in vm.itemOptionStock | orderBy : 'target' : -1">
+                <td>{{item.name}}</td>
+                <td>{{item.target}}</td>
+                <td>{{item.stock}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+      <div class="col-lg-12">
+      <div class="card">
+        <div class="card-heading">
+          <h2>Dispatch Later Cards</h2>
+          <small>All Cards from Dispatch Later Orders</small>
+        </div>
+        <div class="card-body"> 
+          <table class="table table-striped">
+            <thead>
+              <th>Format</th>
+              <th>Items</th>
+              <th>Stock</th>
+            </thead>
+            <tbody>
+              <tr ng-repeat="item in vm.pendingStock">
+                <td>{{item.format}}</td>
+                <td>{{item.item_option_name}}</td>
+                <td>{{item.stock}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div ng-if="vm.stateId&&vm.item">
+  <div class="row">
+    <div class="col-sm-4">
+      <a class="md-btn" ui-sref="printing.stockManagement({id:null})">
+        <i class="mdi-navigation-arrow-back i-20"></i>Back
+      </a>
+      <div class="panel panel-card">
+        <div class="card-heading">
+          <h2>{{vm.item.name}}</h2>
+          <small>{{vm.item.printer_name}}</small>
+          <strong class="text-danger" ng-if="!vm.item.enabled">This Package is Disabled</strong>
+        </div>
+        <div class="list-group no-radius no-border">
+          <div class="list-group-item">
+            <span class="pull-right" ng-class="{'text-success':vm.item.stock>=100,'text-warning':vm.item.stock<100,'text-danger': vm.item.stock<1}">{{vm.item.stock}}</span> Status
+          </div>
+          <div class="list-group-item">
+            <span class="pull-right">{{vm.item.customisation}}</span> Customisation
+          </div>
+          <div class="list-group-item">
+            <span class="pull-right" ng-class="vm.item.enabled?'text-success':'text-danger'">{{vm.item.enabled?"Enabled":"Disabled"}}</span> Status
+          </div>
+          <div class="list-group-item">
+            <span class="pull-right badge bg-primary">{{vm.item.criterias.length}}</span> Criterias
+          </div>
+          <div class="list-group-item">
+            <span class="pull-right badge bg-primary">{{vm.item.supplier_contacts.length}}</span> Supplier Contacts
+          </div>
+          <div class="list-group-item">
+            <span class="pull-right">{{vm.item.group_package?"Yes":"No"}}</span> Group Package
+          </div>
+          <div class="list-group-item">
+            <span class="pull-right">{{vm.item.packaging_format}}</span> Format
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-8">
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="panel panel-card">
+            <div class="panel-body">
+              <span class="pull-left">
+                <ul class="nav nav-pills m-b">
+                  <li class="nav-item {{vm.item?'active':''}}">
+                    <a href data-toggle="pill" data-target="#main-tab">Main</a>
+                  </li>
+                  <li class="nav-item">
+                    <a href data-toggle="pill" data-target="#criteria-tab">Criterias</a>
+                  </li>
+                  <li class="nav-item">
+                    <a href data-toggle="pill" data-target="#supplier-tab">Suppliers</a>
+                  </li>
+                </ul>
+              </span>
+              <span class="pull-right">
+                <md-button ng-if="vm.item.id" class="md-raised md-primary btn-fw m-b-sm" ng-click="vm.changeStatus(vm.item)">{{vm.item.enabled?"Deactivate":"Activate"}}</md-button>
+                <md-button ng-if="vm.item.id" class="md-raised md-primary btn-fw m-b-sm" ng-click="vm.saveItem(vm.item)">Save</md-button>
+                <md-input-container ng-if="!vm.item.id">
+                  <md-checkbox ng-model="vm.item.enabled">Active</md-checkbox>
+                </md-input-container>
+                <md-button ng-if="!vm.item.id" class="md-raised md-primary btn-fw m-b-sm" ng-click="vm.addItem(vm.item)">Create</md-button>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-content">
+        <div class="tab-pane {{vm.item?'active':''}}" id="main-tab" role="tabpanel">
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="panel panel-card">
+                <div class="card-heading">
+                  <h2>Main</h2>
+                </div>
+                <div class="panel-body">
+                  <form name="main">
+                    <md-input-container class="md-block">
+                      <input mdInput placeholder="Name" ng-model="vm.item.name">
+                    </md-input-container>
+                    <md-input-container class="md-block">
+                      <input mdInput placeholder="Printer Name" ng-model="vm.item.printer_name">
+                    </md-input-container>
+                    <md-input-container class="md-block">
+                      <input mdInput type="number" name="stock" placeholder="stock" ng-model="vm.item.stock" min="0">
+                      <div ng-messages="main.stock.$error" role="alert">
+                        <div ng-message="min">
+                          Stock can not be less than 0
+                        </div>
+                      </div>
+                    </md-input-container>
+                    <md-input-container>
+                      <input mdInput placeholder="Customisation" ng-model="vm.item.customisation">
+                    </md-input-container>
+                    <md-input-container class="pull-left">
+                      <label>Packaging Format</label>                        
+                      <md-select ng-model="vm.item.packaging_format" name="packaging">
+                        <md-option ng-repeat="option in vm.packaging_formats" ng-value="option">{{option}}</md-option>
+                      </md-select>
+                      <div ng-messages="main.packaging.$error" role="alert">
+                        <div ng-message="required">Required field</div>
+                      </div>
+                    </md-input-container>
+                    <md-input-container>
+                      <md-checkbox ng-model="vm.item.group_package">Group Package</md-checkbox>
+                    </md-input-container>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tab-pane" id="criteria-tab" role="tabpanel">
+          <div class="row">
+            <div class="col-xs-12">
+              <md-button class="md-raised md-primary btn-fw m-b-sm pull-right" ng-click="vm.item.criterias.unshift(vm.newCriteria);">New</md-button>
+            </div>
+            <div class="col-sm-12" ng-form="criteriaForm" ng-repeat="criteria in vm.item.criterias">
+              <div class="panel panel-card">
+                <div class="card-heading">
+                  <h4>{{criteria.id?criteria.printer_format_hash:'NEW'}}</h4>
+                </div>
+                <div class="card-tools">
+                  <ul class="list-inline">
+                    <li class="dropdown">
+                        <button md-ink-ripple data-toggle="dropdown" class="md-btn md-flat md-btn-circle">
+                          <i class="mdi-navigation-more-vert text-md"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-scale pull-right pull-up top text-color">
+                          <li>
+                            <a ng-click="vm.deleteCriteriaDialog(criteria)" ng-if="criteria.id">Delete</a>
+                            <a ng-click="vm.item.criterias.shift();" ng-if="!criteria.id">Delete</a>
+                          </li>
+                        </ul>
+                      </li>
+                  </ul>
+                </div>
+                <div class="panel-body">
+                  <h5>Format Target</h5>
+                  <p>                  
+                    <span ng-repeat="format in vm.formats">
+                      <md-button ng-if="criteria.format_target.indexOf(format)>=0" ng-click="criteria.format_target.splice(criteria.format_target.indexOf(format),1)" class="btn btn-primary">{{format}}</md-button>
+                      <md-button ng-if="criteria.format_target.indexOf(format)<0" ng-click="criteria.format_target.push(format)" class="btn btn-default">{{format}}</md-button>
+                    </span>
+                  </p>
+                  <div>
+                    <md-input-container>
+                      <input mdInput type="number" name="max" placeholder="max quantity" ng-model="criteria.max_quantity" min="0">
+                      <div ng-messages="criteriaForm.max.$error" role="alert">
+                        <div ng-message="min">
+                          Stock can not be less than 0
+                        </div>
+                      </div>
+                    </md-input-container>
+                    <md-input-container>
+                      <input mdInput type="number" name="min" placeholder="min quantity" ng-model="criteria.min_quantity" min="0">
+                      <div ng-messages="criteriaForm.min.$error" role="alert">
+                        <div ng-message="min">
+                          Stock can not be less than 0
+                        </div>
+                      </div>
+                    </md-input-container>
+                  </div>
+                  <md-input-container>
+                    <label>Recipient Type</label>                        
+                      <md-select ng-model="criteria.recipient_type" name="recipient">
+                        <md-option ng-repeat="option in vm.options" ng-value="option">{{option}}</md-option>
+                      </md-select>
+                      <div ng-messages="criteriaForm.recipient.$error" role="alert">
+                        <div ng-message="required">Required field</div>
+                      </div>
+                    </md-input-container>
+                    <md-button ng-if="criteria.id" ng-click="vm.saveCriteria(criteria)" class="btn btn-primary pull-right">Save</md-button>                    
+                    <md-button ng-if="!criteria.id" ng-click="vm.addCriteria(criteria)" class="btn btn-primary pull-right">Add</md-button>
+                    <md-button ng-if="criteria.id&&(!criteria.packaging_change_statuses[0]||criteria.packaging_change_statuses[0].status=='DISABLED')" ng-click="vm.updateCriteriaStatus(criteria,'ENABLED')" class="btn btn-primary pull-right">ENABLE</md-button>
+                    <md-button ng-if="criteria.id&&criteria.packaging_change_statuses[0].status=='ENABLED'" ng-click="vm.updateCriteriaStatus(criteria,'DISABLED')" class="btn btn-primary pull-right">DISABLE</md-button>
+                    
+                </div>
+                <!-- <md-button class="md-secondary md-icon-button" md-ink-ripple data-toggle="dropdown" aria-label="menu">
+                    <md-icon class="mdi-navigation-more-vert text-md"></md-icon>
+                  </md-button>
+                <ul class="md-secondary dropdown-menu dropdown-menu-scale pull-right pull-up top text-color">
+                  <li><a ng-click="vm.editFilter(filter)">Edit</a></li>
+                  <li><a ng-click="vm.deleteFilter(filter)">Delete</a></li>
+                </ul> -->
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tab-pane" id="supplier-tab" role="tabpanel">
+          <div class="row">
+              <div class="col-xs-12">
+                  <md-button class="md-raised md-primary btn-fw m-b-sm pull-right" ng-click="vm.item.supplier_contacts.unshift(vm.newSupplier);">New</md-button>
+                </div>
+                <div class="col-sm-12" ng-form="supplierForm" ng-repeat="supplier in vm.item.supplier_contacts">
+                  <div class="panel panel-card">
+                    <div class="card-heading">
+                      <h4>{{supplier.id?supplier.company_name:'NEW'}}</h4>
+                    </div>
+                    <div class="card-tools">
+                      <ul class="list-inline">
+                        <li class="dropdown">
+                            <button md-ink-ripple data-toggle="dropdown" class="md-btn md-flat md-btn-circle">
+                              <i class="mdi-navigation-more-vert text-md"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-scale pull-right pull-up top text-color">
+                              <li>
+                                <a ng-click="vm.deleteSupplierDialog(supplier)" ng-if="supplier.id">Delete</a>
+                                <a ng-click="vm.item.supplier_contacts.shift();" ng-if="!supplier.id">Delete</a>
+                              </li>
+                            </ul>
+                          </li>
+                      </ul>
+                    </div>
+                    <div class="panel-body">
+                      <md-input-container>
+                        <input mdInput placeholder="Name" ng-model="supplier.company_name">
+                      </md-input-container>
+                      <md-input-container>
+                        <input mdInput placeholder="Lead Time" ng-model="supplier.lead_time">
+                      </md-input-container>
+                      <md-input-container>
+                        <input mdInput type="number" name="min" placeholder="min order quantity" ng-model="supplier.minimum_order_quantity" min="0">
+                        <div ng-messages="supplierForm.min.$error" role="alert">
+                          <div ng-message="min">
+                            Quantity can not be less than 0
+                          </div>
+                        </div>
+                      </md-input-container>
+                      <md-button ng-if="supplier.id" ng-click="vm.saveSupplier(supplier)" class="btn btn-primary pull-right">Save</md-button>                    
+                      <md-button ng-if="!supplier.id" ng-click="vm.addSupplier(supplier)" class="btn btn-primary pull-right">Add</md-button>
+                      <div class="col-sm-12" ng-form="contactForm" ng-repeat="contact in supplier.company_contacts track by $index">
+                        <div class="panel panel-card">
+                          <div class="panel-body" ng-if="contact.edit">
+                            <md-input-container style="margin-bottom:0;width:  49%;">
+                              <input mdInput placeholder="First Name" ng-model="contact.first_name">
+                            </md-input-container>
+                            <md-input-container style="margin-bottom:0;width:  49%;">
+                              <input mdInput placeholder="Last Name" ng-model="contact.last_name">
+                            </md-input-container>
+                            <div class="col-sm-6">
+                              <div ng-repeat="email in contact.email track by $index" class="row">
+                                <md-input-container style="margin-bottom:0">
+                                  <input mdInput placeholder="email" ng-model="email">
+                                </md-input-container>
+                              </div>
+                              <div>
+                                <a ng-click="contact.email.push('')">
+                                  <i class="btn-default btn-rounded btn-icon icon mdi-content-add i-20"></i>
+                                </a>
+                              </div>
+                            </div>
+                            <div class="col-sm-6">
+                              <div ng-repeat="phone in contact.phone_number track by $index" class="row">                              
+                                <md-input-container style="margin-bottom:0">
+                                  <input mdInput placeholder="Phone" ng-model="phone">
+                                </md-input-container>
+                              </div>
+                              <div>
+                                <a ng-click="contact.phone_number.push('')">
+                                  <i class="btn-default btn-rounded btn-icon icon mdi-content-add i-20"></i>
+                                </a>
+                              </div>
+                            </div>
+                            <md-button ng-if="supplier.id" ng-click="vm.saveSupplier(supplier)" class="btn btn-primary pull-right">Save</md-button>                    
+                            <md-button ng-if="!supplier.id" ng-click="vm.addSupplier(supplier)" class="btn btn-primary pull-right">Add</md-button> 
+
+                            <md-button ng-if="supplier.id" ng-click="supplier.company_contacts.splice($index,1);vm.saveSupplier(supplier);" class="btn btn-primary pull-right">Delete</md-button>                                                
+                            <md-button ng-if="!supplier.id" ng-click="supplier.company_contacts.splice($index,1);" class="btn btn-primary pull-right">Delete</md-button>                                                
+                          </div>
+                          <div ng-if="!contact.edit">
+                            <div class="card-heading">
+                              <h2>{{contact.first_name}} {{contact.last_name}}</h2>
+                            </div>
+                            <div class="card-tools">
+                                <ul class="list-inline">
+                                  <li class="dropdown">
+                                    <button md-ink-ripple data-toggle="dropdown" class="md-btn md-flat md-btn-circle">
+                                      <i class="mdi-navigation-more-vert text-md"></i>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-scale pull-right pull-up top text-color">
+                                      <li>
+                                        <a ng-click="contact.edit=true">Edit</a>
+                                      </li>
+                                      <li>
+                                        <a ng-click="supplier.company_contacts.splice($index,1)">Delete</a>
+                                      </li>
+                                    </ul>
+                                  </li>
+                                </ul>
+                              </div>
+                            <div class="list-group no-radius no-border">
+                              <div class="list-group-item">
+                                <span class="pull-right">{{contact.email.toString();}}</span> Email
+                              </div>
+                              <div class="list-group-item">
+                                <span class="pull-right">{{contact.phone_number.toString();}}</span> Phone
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm-12 text-center">
+                        <a ng-click="supplier.company_contacts.push(vm.newContact)">
+                          <i class="mdi-content-add i-20"></i>ADD CONTACT
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

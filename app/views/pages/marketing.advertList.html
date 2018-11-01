@@ -1,0 +1,39 @@
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-sm-12">
+      <h3 class="text-u-c">Advert List</h3>
+  </div>  
+</div>
+<div class="row">
+  <div class="col-sm-12">
+    <div class="card">
+      <div class="card-heading">
+        <h4 class="text-center">{{vm.text}}</h4>
+      </div>
+      <div class="card-body">
+        <div class="h4">Search: <input type="text" ng-model="vm.test">
+          <span class="pull-right">
+            <md-button class="md-raised md-primary" ui-sref="marketing.advert({advert: 'new'})">New advert</md-button>
+          </span>
+        </div>
+        <table class="table table-hover" ng-if="vm.finish">
+          <thead>
+            <tr>
+              <th ng-click="vm.active('enabled')">Active<i ng-class="vm.arrow('enabled')"></th>
+              <th ng-click="vm.active('title')">Title<i ng-class="vm.arrow('title')"></th>
+              <th ng-click="vm.active('type')">Type<i ng-class="vm.arrow('type')"></th>
+              <th ng-click="vm.active('position')">Position<i ng-class="vm.arrow('position')"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-class="{'danger':!advert.enabled}"ng-repeat="advert in vm.advertList | filter: vm.test | orderBy : vm.selected : vm.reverse" ui-sref="marketing.advert({advert: advert.id})">
+              <td>{{advert.enabled?'Enabled':'Disabled'}}</td>
+              <td>{{advert.title}}</td>
+              <td>{{advert.type}}</td>
+              <td>{{advert.position}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

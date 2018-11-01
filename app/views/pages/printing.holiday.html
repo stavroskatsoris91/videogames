@@ -1,0 +1,233 @@
+<div class="row">
+  <div class="col-sm-12">
+    <div class="panel panel-card">
+      <div class="panel-body">
+        <ul class="nav nav-pills m-b">
+          <li class="nav-item">
+            <a href data-toggle="pill" data-target="#holiday-tab">Holidays</a>
+          </li>
+          <li class="nav-item">
+            <a href data-toggle="pill" data-target="#time-tab">Time</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-12">
+    <div class="tab-content">
+      <div class="tab-pane" id="holiday-tab" role="tabpanel">
+        <div class="panel panel-card">
+          <div class="card-heading">
+            <h2>Printer Holidays</h2>
+            <small>Holidays</small>
+          </div>
+          <div class="panel-body">
+            <md-button ng-if="!vm.new"class="md-raised md-primary" ng-click="vm.new=true">Add Holiday</md-button>
+            <table class="table" ng-if="vm.new" >
+                <tbody>
+                  <tr ng-class="{'warning': vm.newHoliday.date<vm.today}">
+                    <td>
+                    <a ng-click="vm.newHoliday.enabled=!vm.newHoliday.enabled"><i ng-class="['fa fa-circle',{'text-success':vm.newHoliday.enabled===true},{'text-danger':vm.newHoliday.enabled===false}]"></i></a>              
+                    </td>
+                    <td><md-datepicker md-hide-icons="calendar" ng-model="vm.newHoliday.mdDate" ng-change="vm.updateDate(vm.newHoliday)"md-placeholder="Enter date"></md-datepicker>
+                    </td>
+                    <td>
+                      <md-input-container>
+                        <label>{{vm.newHoliday.country.code}}</label>
+                        <md-select ng-model="vm.newHoliday.country.code">
+                          <md-option ng-repeat="country in vm.countries | orderBy:'country'" ng-value="country.code">{{country.country}}</md-option>
+                        </md-select>
+                      </md-input-container>
+                    </td>
+                    <td>
+                      <a ng-click="vm.new=false">
+                        <i class="fa fa-remove i-20"></i>
+                      </a>
+                      <a ng-click="vm.addHoliday()">
+                        <i class="fa text-success fa-save i-20"></i>
+                      </a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+          </div>
+          <div class="panel-body">
+            <table class="table table-hover" ng-if="vm.holidays&&vm.countries" >
+              <thead>
+                <tr>
+                  <th>Active</th>
+                  <th>Date</th>
+                  <th>County</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="hol in vm.holidays | orderBy:'date'" ng-class="{'warning': hol.date<vm.today}">
+                  <td>
+                  <a ng-click="vm.switchStatus(hol);save=false"><i ng-class="['fa fa-circle',{'text-success':hol.enabled===true},{'text-danger':hol.enabled===false}]"></i></a>              
+                  </td>
+                  <td><md-datepicker md-hide-icons="calendar" ng-model="hol.mdDate" ng-change="vm.updateDate(vm.date,hol);save=true"md-placeholder="Enter date"></md-datepicker>
+                  </td>
+                  <td>
+                    <md-input-container>
+                      <label>{{hol.country.code}}</label>
+                      <md-select ng-model="hol.country.code" ng-change="save=true">
+                        <md-option ng-repeat="country in vm.countries | orderBy:'country'" ng-value="country.code">{{country.country}}</md-option>
+                      </md-select>
+                    </md-input-container>
+                  </td>
+                  <td>
+                    <a ng-click="vm.deleteRow(hol)">
+                      <i class="fa fa-remove i-20"></i>
+                    </a>
+                    <a ng-click="vm.saveRow(hol);save=false">
+                      <i class="fa fa-save i-20" ng-class="{'text-success': save}"></i>
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="tab-pane" id="time-tab" role="tabpanel">
+          <div class="panel panel-card">
+            <div class="card-heading">
+              <h2>Printer Time</h2>
+              <small>Time</small>
+            </div>
+            <div class="panel-body">
+              <md-button ng-if="!vm.new"class="md-raised md-primary" ng-click="vm.new=true">Add Time</md-button>
+              <table class="table" ng-if="vm.new" >
+                  <tbody>
+                    <tr>
+                      <td>
+                      <a ng-click="vm.newTime.enabled=!vm.newTime.enabled"><i ng-class="['fa fa-circle',{'text-success':vm.newTime.enabled===true},{'text-danger':vm.newTime.enabled===false}]"></i></a>              
+                      </td>
+                      <td>
+                        <md-input-container>
+                          <input mdInput placeholder="Min Days" type="number" ng-model="vm.newTime.min_days" ng-change="vm.fixMinMax(vm.newTime)"min="0">
+                        </md-input-container>
+                      </td>
+                      <td>
+                        <md-input-container>
+                          <input mdInput placeholder="Max Days" type="number" ng-model="vm.newTime.max_days" ng-change="vm.fixMinMax(vm.newTime)" min="0">
+                        </md-input-container>
+                      </td>
+                      <td>
+                        <md-input-container>
+                          <input mdInput placeholder="Print Earlier" type="number" ng-model="vm.newTime.print_earlier_days" min="0" step="1">
+                        </md-input-container>
+                      </td>
+                      <td>
+                        <md-button ng-if="!vm.newTime.countries.length" class="md-raised md-primary" ng-click="vm.selectCountry(vm.newTime)">Add</md-button>            
+                        <a class="text-primary" ng-click="vm.selectCountry(vm.newTime)">
+                        {{vm.newTime.countries.length?vm.newTime.countries[0].display_name:''}}{{vm.newTime.countries.length>1?' + '+(vm.newTime.countries.length-1):''}}</a>
+                      </td>
+                      <td>
+                        <md-input-container>
+                          <label>Dispatch Type</label>
+                          <md-select ng-model="vm.newTime.dispatch_type" ng-change="save=true">
+                            <md-option value="IMMEDIATE">IMMEDIATE</md-option>
+                            <md-option value="LATER">LATER</md-option>
+                          </md-select>
+                        </md-input-container>
+                      </td>
+                      <td>
+                        <a ng-click="vm.new=false">
+                          <i class="fa fa-remove i-20"></i>
+                        </a>
+                        <a ng-click="vm.addTime();vm.new=false">
+                          <i class="fa text-success fa-save i-20"></i>
+                        </a>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+            </div>
+            <div class="panel-body">
+              <table class="table table-hover" ng-if="vm.holidays&&vm.countries" >
+                <thead>
+                  <tr>
+                    <th>Active</th>
+                    <th>Min Days</th>
+                    <th>Max Days</th>
+                    <th>Print Earlier Days</th>
+                    <th>Countries</th>
+                    <th>Dispatch Type</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-repeat="time in vm.times | orderBy:'date'">
+                    <td>
+                    <a ng-click="vm.switchStatusTime(time);save=false"><i ng-class="['fa fa-circle',{'text-success':time.enabled===true},{'text-danger':time.enabled===false}]"></i></a>              
+                    </td>
+                    <td>
+                      <md-input-container>
+                        <input mdInput placeholder="Min Days" type="number" ng-model="time.min_days" ng-change="vm.fixMinMax(time);save=true"min="0">
+                      </md-input-container>
+                    </td>
+                    <td>
+                      <md-input-container>
+                        <input mdInput placeholder="Max Days" type="number" ng-model="time.max_days" ng-change="vm.fixMinMax(time);save=true" min="0">
+                      </md-input-container>
+                    </td>
+                    <td>
+                      <md-input-container>
+                        <input mdInput placeholder="Print Earlier" type="number" ng-model="time.print_earlier_days" ng-change=";save=true"min="0" step="1">
+                      </md-input-container>
+                    </td>
+                    <td>
+                        <md-button ng-if="!time.countries.length" class="md-raised md-primary" ng-click="vm.selectCountry(time)">Add</md-button>            
+                        <a class="text-primary" ng-click="vm.selectCountry(time)">
+                      {{time.countries.length?time.countries[0].display_name:'0'}}{{time.countries.length>1?' + '+(time.countries.length-1):''}}</a>
+                    </td>
+                    <td>
+                      <md-input-container>
+                        <label>Dispatch Type</label>
+                        <md-select ng-model="time.dispatch_type" ng-change="save=true">
+                          <md-option value="IMMEDIATE">IMMEDIATE</md-option>
+                          <md-option value="LATER">LATER</md-option>
+                        </md-select>
+                      </md-input-container>
+                    </td>
+                    <td>
+                      <a ng-click="vm.deleteTime(time)">
+                        <i class="fa fa-remove i-20"></i>
+                      </a>
+                      <a ng-click="vm.updateTime(time);save=false">
+                        <i class="fa fa-save i-20" ng-class="{'text-success': save}"></i>
+                      </a>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+    </div>
+  </div>
+</div>
+<script type="text/ng-template" id="tabDialog.tmpl.html" passive="true">
+  <md-dialog style="width:8000px;">
+      <form>
+        <md-toolbar>
+          <div class="md-toolbar-tools">
+            <h2>Countries</h2>
+          </div>
+        </md-toolbar>
+        <md-dialog-content style="max-width:8000px;max-height:810px; ">
+          <md-content class="md-padding">
+            <p>
+              <span ng-repeat="country in vm.countries| orderBy:'country'"> <button ng-click="vm.addCountry(country)" ng-class="{'btn-primary':country.selected=='same','btn-danger':country.selected=='other'}">{{country.country}}</button></span>                                  
+            </p>
+          </md-content>
+        </md-dialog-content>
+        <md-dialog-actions layout="row">
+          <md-button ng-click="vm.answer(false)">Cancel</md-button>
+          <md-button ng-click="vm.answer(true)" >Confirm</md-button>
+        </md-dialog-actions>
+      </form>
+    </md-dialog>
+  </script>

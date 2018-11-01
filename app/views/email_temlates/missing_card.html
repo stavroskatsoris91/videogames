@@ -1,0 +1,194 @@
+<div style="background-color: white;">
+    <md-button class="md-raised md-primary btn-fw m" ng-click="vm.copyText('tab-1')">Copy Template</md-button>
+    <md-input-container>
+        <label>options</label>
+        <md-select ng-model="vm.screensImage" ng-change="vm.changeOption()">
+            <md-option ng-repeat="option in vm.emailOptions" ng-value="option.query" 
+            ng-hide="option.query=='isThreeDays'&&vm.deliveryZone.zone!=1||option.query=='isUnderMaxDay'&&vm.deliveryZone.zone==1">{{option.title}}</md-option>
+        </md-select>
+    </md-input-container>
+    <md-checkbox ng-model="vm.isAngry" class="md-primary">
+        Angry Customer
+    </md-checkbox>
+    <md-checkbox ng-model="vm.isWeekend" class="md-primary" ng-hide="vm.isThreeDays">
+        Reply on Weekend
+    </md-checkbox>
+    <md-checkbox ng-model="vm.threeOccasion" class="md-primary" ng-if="vm.isThreeDays">
+        Missed Occasion
+    </md-checkbox>
+    <b class="p label-lg col-sm-12 text-danger" ng-if="!vm.getStatusDate('SENT')" style="background-color: white;">This order has not been dispatched yet</b>
+</div>
+<div class="col-sm-12" ng-if="vm.getStatusDate('SENT')" id="tab-1"style="background-color: white;">
+    Hi {{vm.buyer.contact.firstname}},
+    <br><br>
+    <span ng-if="vm.isThreeDays||vm.isUnderMaxDay">
+        Thanks for getting in touch, and I’m so sorry to hear your {{vm.noOfCards()>1?'cards haven':'card hasn'}}’t arrived yet. Having checked your order I can confirm it was dispatched on {{vm.getStatusDate("SENT")}}, please see a copy of your order details below:
+    </span>
+    <span ng-if="vm.isStandard||vm.isLate||vm.isOccasion||vm.isAddress">
+        Thanks for getting in touch and I’m so sorry to hear your {{vm.noOfCards()>1?'cards haven':'card hasn'}}’t arrived. Having checked your order I can confirm it was dispatched on {{vm.getStatusDate("SENT")}}, please see a copy of your order details below:
+    </span>
+    <br><br>
+    <span ng-if="vm.statusType(status.status)" ng-repeat="status in vm.order.status_changes.slice().reverse()">
+        <img ng-src="{{'images/space.jpg'}}">
+        <span>
+            {{ status.status=='SENT'?vm.editDate(status.created):status.created | date : 'd MMM yy h:mm:ss a'}}
+            <br>
+            <img ng-src="{{'images/space.jpg'}}">
+            <span>
+                {{status.status}}
+            </span>
+        </span>
+        <br>
+        <span ng-if="status.status!='SENT'">
+            <img ng-src="{{'images/space.jpg'}}">
+            <br>
+        </span>
+    </span>
+    <br>
+    <span ng-if="vm.isStandard">
+        <span ng-if="vm.deliveryZone.zone==1">
+            Your order was dispatched via First Class post with our partners the Royal Mail; this is a next day service, but they do admit a small number of the items they’re processing can take up to three working days to arrive. Unfortunately, as it’s now been more than three days it looks like your {{vm.noOfCards()==1?'card has':'cards have'}} got caught up in their system and may have been lost along the way. Sadly, we can’t track your order once it leaves our printers, so there is a limit to what we can do when the card is in the postie’s hands!
+        </span>
+        <span ng-if="vm.deliveryZone.zone!==1">
+            Your order was dispatched via International Standard post with our partners the Royal Mail; they estimate that your order should arrive within {{vm.deliveryZone.min_days}}-{{vm.deliveryZone.max_days}} working days. Unfortunately, as it’s now been more than five days it looks like your {{vm.noOfCards()==1?'card has':'cards have'}} got caught up the postal system and may have been lost along the way. Sadly, we can’t track your order once it leaves our printers, so there is a limit to what we can do when the card is in the postie’s hands!
+        </span>
+    </span>
+    <span ng-if="vm.isUnderMaxDay">
+        Your order was dispatched via International Standard post with our partners the Royal Mail; they estimate that your order should arrive within {{vm.deliveryZone.min_days}}-{{vm.deliveryZone.max_days}} working days. 
+        <br><br>
+        As your {{vm.noOfCards()>1?'cards have':'card has'}} only been in the postal service for {{vm.daysInPost()}} working {{vm.daysInPost()<2?'day':'days'}}, the good news is that it’s very likely your {{vm.noOfCards()>1?'cards':'card'}} will arrive {{vm.estimatedDay}}. The best thing to do would be to check after this time has past, however if {{vm.noOfCards()>1?'they':'it'}} still {{vm.noOfCards()>1?'have':'has'}}’t arrived please do let us know and we’ll be happy to do all that we can to get this sorted for you :)        
+    </span>
+    <span ng-if="vm.isThreeDays">
+        <span ng-if="!vm.threeOccasion">
+            Your order was dispatched via First Class post with our partners the Royal Mail; this is a next day service, but they do admit a small number of the items they’re processing can take up to three working days to arrive. Unfortunately, it looks like your order has gotten caught up their system and been delayed along the way. 
+        </span>
+        <span ng-if="vm.threeOccasion">
+            Your order was dispatched via First Class post with our partners the Royal Mail; this is a next day service, but they do admit a small number of the items they’re processing can take up to three working days to arrive.
+        </span>
+        <br><br>
+        <span ng-if="vm.isAngry">
+            We totally understand it’s frustrating for your card to miss it’s expected delivery date - it’s really frustrating for us as a business as this is something we have no control over and we hate letting our customers down.
+            <br><br>
+        </span>
+        <span ng-if="!vm.threeOccasion">
+            Sadly, we can’t track your order once it leaves our printers, so there is a limit to what we can do when the {{vm.noOfCards()==1?"card is":"cards are"}} in the postie’s hands, and this is why we only offer an estimated delivery date, as we cannot guarantee next day delivery.
+            <br><br>
+            We’re really sorry about this! We always make sure that orders are dispatched promptly in order to give them the best possible chance of arriving on time, however unfortunately a small percentage of cards do get delayed in the post. 
+            <br><br>
+            As your {{vm.noOfCards()>1?'cards have':'card has'}} only been in the postal service for {{vm.daysInPost()}} working {{vm.daysInPost()<2?'day':'days'}}, the good news is that it’s very likely your {{vm.noOfCards()>1?'cards':'card'}} will arrive {{vm.firstDelivery?vm.firstDelivery+' or ': ''}}{{vm.nextDelivery}}{{vm.soonestDelivery?' or '+vm.soonestDelivery:''}}. The best thing to do would be to check {{vm.firstDelivery?vm.firstDelivery+'’s and ':''}}{{vm.nextDelivery}}’s {{vm.soonestDelivery? 'and '+vm.soonestDelivery+'’s ':''}}post, however if {{vm.noOfCards()>1?'they still haven’t':'it still hasn’t'}} arrived please do let us know and we’ll be happy to do all that we can to get this sorted for you :)
+        </span>
+        <span ng-if="vm.threeOccasion">
+            Sadly, we can’t track your order once it leaves our printers, so there is a limit to what we can do when the {{vm.noOfCards()==1?"card is":"cards are"}} in the postie’s hands! We’re really sorry about this! We always make sure that orders are dispatched promptly in order to give them the best possible chance of arriving on time, but unfortunately a small percentage of cards do get delayed in the post.
+            <br><br>
+            However, we really want to make this up to you. What we would normally do is ask that you wait the three working days, but given that the occasion has now passed what we’ll do is put a free card credit onto your thortful account. This means that your next A5 card will be free - you’ll just need to tick the box to apply the credit on the final page of checkout next time.
+            <br><br>
+            We’re really sorry things went wrong this time, and I hope we can exceed your expectations in the future.
+        </span>
+    </span>
+    <span ng-if="vm.isOccasion">
+        <span ng-if="vm.deliveryZone.zone==1">
+            Your order was dispatched via First Class post with our partners the Royal Mail; this is a next day service, but they do admit a small number of the items they’re processing can take up to three working days to arrive. Unfortunately, as it’s now been more than three days it looks like your {{vm.noOfCards()==1?'card has':'cards have'}} got caught up in their system and may have been lost along the way. Sadly, we can’t track your order once it leaves our printers, so there is a limit to what we can do when the card is in the postie’s hands!
+        </span>
+        <span ng-if="!vm.deliveryZone.zone==1">
+            Your order was dispatched via Royal Mail International Standard Post, which estimates your card should arrive within {{vm.deliveryZone.min_days}}-{{vm.deliveryZone.max_days}} days. Unfortunately the Royal Mail offer no way of tracking their letters/cards, so there’s nothing we can do once our cards are in the postie’s hands!
+        </span>
+    </span>
+    <span ng-if="vm.isAngry&&!vm.isThreeDays">
+        <span ng-if="!vm.isLate&&!vm.isAddress"><br><br></span>
+        We totally understand it’s frustrating to have your card miss the occasion - it’s really frustrating for us as a business as this is something we have no control over and we hate letting our customers down. 
+    </span>
+    <span ng-if='vm.isOccasion'>
+        <br><br>
+        However, we really want to make this up to you. What we would normally do is have your {{vm.noOfCards()>1?'cards':'card'}} reprinted and sent out again today, free of charge. However, being that the occasion has now passed, what we’ll do is put {{vm.cardCredits}} on your thortful account, which means that your next {{vm.freeCards}} will be free - you’ll just need to tick the box to apply the credit on the final page of checkout next time.
+        <br><br>
+        We’re really sorry things went wrong this time, and I really hope we can exceed your expectations in future.
+    </span>
+    <span ng-if='vm.isStandard'>
+        <br><br>
+        <span ng-if="vm.deliveryZone.zone==1">
+            However, we really want to make this up to you, so what we can do is have your {{vm.noOfCards()>1?'cards':'card'}} reprinted and sent out again {{vm.reDispatchDay}}, free of charge. All being well with the postal service {{vm.noOfCards()>1?'these':'this'}} should arrive with {{vm.reDeliverDay}}'s post. Alternatively, if you’d rather not have your {{vm.noOfCards()>1?'cards':'card'}} re-sent then we could give you {{vm.cardCredits}} on your thortful account, which means that your next {{vm.freeCards}} will be free - you’ll just need to tick the box to apply the credit on the final page of checkout next time.
+            <br><br>
+            If you’d like us to send your order again, could you please confirm the address below by {{vm.dispatchTime}} and we’ll get this sorted for you straight away.
+            <br><br>
+            <b>
+                <span ng-if="vm.order.delivery_address.recipient">{{vm.order.delivery_address.recipient}}<br></span>
+                <span ng-if="vm.order.delivery_address.address1">{{vm.order.delivery_address.address1}}<br></span>
+                <span ng-if="vm.order.delivery_address.address2">{{vm.order.delivery_address.address2}}<br></span>
+                <span ng-if="vm.order.delivery_address.address3">{{vm.order.delivery_address.address3}}<br></span>
+                <span ng-if="vm.order.delivery_address.city">{{vm.order.delivery_address.city}}<br></span>
+                <span ng-if="vm.order.delivery_address.state">{{vm.order.delivery_address.state}}<br></span>
+                <span ng-if="vm.order.delivery_address.postcode">{{vm.order.delivery_address.postcode}}<br></span>
+                <span ng-if="vm.order.delivery_address.country">{{vm.order.delivery_address.country}}<br></span>
+            </b><br>
+        </span>
+        <span ng-if="vm.deliveryZone.zone!=1">
+            However, we really want to make this up to you, so what we can do is give you {{vm.cardCredits}} on your thortful account, which means that your next {{vm.freeCards}} will be free - you’ll just need to tick the box to apply the credit on the final page of checkout next time.
+            <br><br>
+        </span>
+        We’re really sorry things went wrong this time, and I really hope we can exceed your expectations in future.
+    </span>
+    <span ng-if='vm.isLate'>
+        <span ng-if="vm.isAngry"><br><br></span>
+        Your order was dispatched via First Class post with our partners the Royal Mail; this is a next day service, but they do admit a small number of the items they’re processing can take up to three working days to arrive. Unfortunately, as it’s now been more than three days it looks like your {{vm.noOfCards()==1?'card has':'cards have'}} got caught up in their system and may have been lost along the way. Sadly, we can’t track your order once it leaves our printers, so there is a limit to what we can do when the card is in the postie’s hands!
+        <br><br>
+        What we would normally do to make this up to you is send the {{vm.noOfCards()>1?'cards':'card'}} out again for you, free of charge. We suggest that you contact us if your order has not arrived after 4 working days following your order, so do bear in mind that in future it’s worth getting in touch sooner rather than later so that we can sort this for you. However, as the occasion has now passed, what I have done is added {{vm.cardCredits}} to your account, which means that your next {{vm.freeCards}} will be free - you’ll just need to tick the box to apply the credit on the final page of checkout next time. 
+        <br><br>
+        We’re really sorry things went wrong this time, and I really hope we can exceed your expectations in future.
+    </span>
+    <span ng-if="vm.isAddress">
+        <span ng-if="vm.isAngry"><br><br></span>
+        I can see that the delivery address you entered was the following:
+        <br><br>
+        <b>
+            <span ng-if="vm.order.delivery_address.recipient">{{vm.order.delivery_address.recipient}}<br></span>
+            <span ng-if="vm.order.delivery_address.address1">{{vm.order.delivery_address.address1}}<br></span>
+            <span ng-if="vm.order.delivery_address.address2">{{vm.order.delivery_address.address2}}<br></span>
+            <span ng-if="vm.order.delivery_address.address3">{{vm.order.delivery_address.address3}}<br></span>
+            <span ng-if="vm.order.delivery_address.city">{{vm.order.delivery_address.city}}<br></span>
+            <span ng-if="vm.order.delivery_address.state">{{vm.order.delivery_address.state}}<br></span>
+            <span ng-if="vm.order.delivery_address.postcode">{{vm.order.delivery_address.postcode}}<br></span>
+            <span ng-if="vm.order.delivery_address.country">{{vm.order.delivery_address.country}}<br></span>
+        </b><br>
+        It looks like this might be incorrect/incomplete?
+        <br><br>
+        Unfortunately we simply do not have the ability to double check the delivery address on every single order placed! On this occasion though, as a gesture of goodwill we’ll be happy to get the address changed for you and then re-send your card, if you could let us know the correct address.
+        <br><br>
+        Please do remember to double check the address you enter on checkout next time! 
+        <br><br>
+        Let us know and we can get this sorted for you :)
+    </span>
+    <br><br>
+    Thanks,
+    <br>{{vm.root.admin.contact.firstname}}
+</div>
+<div class="col-sm-12" ng-if="!vm.getStatusDate('SENT')" id="tab-1"style="background-color: white;">
+    Hi {{vm.buyer.contact.firstname}},
+    <br><br>
+    Thanks for getting in touch. 
+    <br><br>
+    Having checked I can see that your order was placed on {{vm.getStatusDate("PAID")}}. 
+    <br><br>
+    <span ng-repeat="status in vm.order.status_changes" ng-if="status.status=='PAID'">
+        <img ng-src="{{'images/space.jpg'}}">
+        <span>
+            {{status.created | date : 'd MMM yy h:mm:ss a'}}
+        </span><br>
+        <span class="text-info">{{status.status}}</span>
+    </span>
+    <br><br>
+    <span ng-if="vm.orderMadeDay.getDay()==0||vm.orderMadeDay.getDay()==6">
+        We only dispatch cards Monday - Friday, so as your order was placed on {{vm.dayOfWeek(vm.orderMadeDay.getDay())}}, it will be dispatched {{vm.today==1?'today':'on'+vm.dayOfWeek(vm.today)}}.        
+    </span>
+    <span ng-if="!(vm.orderMadeDay.getDay()==0||vm.orderMadeDay.getDay()==6)">
+        We only dispatch cards Monday - Friday, if they are ordered before 5pm, so as your order was placed on {{vm.dayOfWeek(vm.orderMadeDay.getDay())}} after 5pm, it will be dispatched {{vm.nextOrderDispatch}}.
+    </span>
+    <br><br>
+    We give a delivery estimate both on checkout and on your confirmation email, in order to let you know when to expect your order to arrive, so this should have been clear when placing your order? 
+    <br><br>
+    Please do let us know if this was not the case and we’ll be happy to feedback to the team, but in the meantime I hope this helps to clarify :)
+    <br><br>
+    If you have any other questions of queries then please do get in touch.
+    <br><br>
+    Thanks,
+    <br>{{vm.root.admin.contact.firstname}}
+</div>

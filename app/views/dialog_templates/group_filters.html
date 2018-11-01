@@ -1,0 +1,223 @@
+<md-dialog>
+    <form name="groupForm" ng-submit="vm.answer(true)" ng-if="vm.list.filters" ng-cloak>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2>{{vm.item.is_group?'Group':'Filter'}}</h2>
+            </div>
+        </md-toolbar>
+        <md-dialog-content style="min-width:600px;">
+            <md-tabs ng-if="vm.item.is_group" md-dynamic-height md-border-bottom>
+                <md-tab label="Main">
+                    <md-content class="md-padding">
+                        <div class="col-sm-12">
+                            <md-input-container>
+                                <input mdInput placeholder="Title" name="title" ng-model="vm.item.title" required>
+                                <div ng-messages="groupForm.title.$error" role="alert">
+                                    <div ng-message="required">Required field</div>
+                                </div>
+                            </md-input-container>
+                        </div>
+                        <div class="col-sm-12">
+                            <md-input-container>
+                                <label>Select Mode</label>
+                                <md-select ng-model="vm.item.select_mode" name="select" required>
+                                    <md-option ng-repeat="option in ['MULTISELECT','ONE_ELEMENT']" ng-value="option">{{option}}</md-option>
+                                </md-select>
+                                <div ng-messages="groupForm.select.$error" role="alert">
+                                    <div ng-message="required">Required field</div>
+                                </div>
+                            </md-input-container>
+                        </div>
+                        <div class="col-sm-12">
+                            <md-input-container>
+                                <input mdInput type="number" name="position" placeholder="Position" ng-model="vm.item.position" min="0" required>
+                                <div ng-messages="groupForm.position.$error" role="alert">
+                                    <div ng-message="min">
+                                        Rank can not be less than 0
+                                    </div>
+                                    <div ng-message="required">Required field</div>
+                                </div>
+                            </md-input-container>
+                        </div>
+                    </md-content>
+                </md-tab>
+                <md-tab label="Filters" ng-if="vm.item.id">
+                    <md-content class="md-padding">
+                        <p class="col-sm-12" ng-if='vm.list.filters'>
+                            <md-autocomplete md-no-cache="true" md-selected-item-change="vm.addItem(item,vm.item.filters)" md-items="item in vm.list.filters| filter :vm.text"
+                                md-search-text="vm.text" md-item-text="item.label">
+                                <span>{{ item.label }}</span>
+                            </md-autocomplete>
+                        </p>
+                        <div class="col-sm-12">
+                            <span ng-repeat="filter in vm.item.filters">
+                                <a class="indigo m-b md-btn md-raised" ng-click="vm.removeFilterItem(filter,vm.item.filters)">{{filter.label}}</a>
+                            </span>
+                        </div>
+                        <div class="col-sm-12" ng-if="!vm.showNew">
+                            <a class="blue m-b md-btn md-raised" ng-click="vm.createNew(vm.item.id)">+ New</a>
+                        </div>
+                        <div class="col-sm-12" ng-if="vm.showNew">
+                            <md-input-container>
+                                <input mdInput placeholder="Label" name="label" ng-model="vm.newFilter.label" required>
+                                <div ng-messages="groupForm.label.$error" role="alert">
+                                    <div ng-message="required">Required field</div>
+                                </div>
+                            </md-input-container>
+                            <md-input-container>
+                                <label>Type</label>
+                                <md-select ng-model="vm.newFilter.type" name="type" ng-change="vm.newFilter.category_id=null;vm.newFilter.tag=null" required>
+                                    <md-option ng-repeat="option in ['CATEGORY','TAG']" ng-value="option">{{option}}</md-option>
+                                </md-select>
+                                <div class="md-errors-spacer"></div>
+                                <div ng-messages="groupForm.type.$error" role="alert">
+                                    <div ng-message="required">Required field</div>
+                                </div>
+                            </md-input-container>
+                            <md-input-container ng-if="vm.newFilter.type=='CATEGORY'&&vm.categories">
+                                <label>Category</label>
+                                <md-select ng-model="vm.newFilter.category_id" name="category" required>
+                                    <md-option ng-repeat="category in vm.categories" ng-value="category.id">{{category.title}}</md-option>
+                                </md-select>
+                                <div class="md-errors-spacer"></div>
+                                <div ng-messages="groupForm.category.$error" role="alert">
+                                    <div ng-message="required">Required field</div>
+                                </div>
+                            </md-input-container>
+                            <md-input-container ng-if="vm.newFilter.type=='TAG'">
+                                <input mdInput placeholder="Tag" name="tag" ng-model="vm.newFilter.tag" required>
+                                <div ng-messages="groupForm.tag.$error" role="alert">
+                                    <div ng-message="required">Required field</div>
+                                </div>
+                            </md-input-container>
+                            <button class="blue m-b md-btn md-raised" ng-click="vm.newFilterInGroup(vm.newFilter)" ng-disabled="groupForm.$error.required">Add</button>
+                            <button class="m-b md-btn md-raised" ng-click="vm.showNew=false">cancel</button>
+                        </div>
+                    </md-content>
+                </md-tab>
+            </md-tabs>
+            <md-tabs ng-if="!vm.item.is_group" md-dynamic-height md-border-bottom>
+                <md-tab label="Main">
+                    <md-content class="md-padding">
+                        <div class="col-sm-12">
+                            <md-input-container>
+                                <input mdInput placeholder="Label" name="label" ng-model="vm.item.label" required>
+                                <div ng-messages="groupForm.label.$error" role="alert">
+                                    <div ng-message="required">Required field</div>
+                                </div>
+                            </md-input-container>
+                        </div>
+                        <div class="col-sm-12">
+                            <md-input-container>
+                                <input mdInput type="number" name="position" placeholder="Position" ng-model="vm.item.position" min="0" required>
+                                <div ng-messages="groupForm.position.$error" role="alert">
+                                    <div ng-message="min">
+                                        Rank can not be less than 0
+                                    </div>
+                                    <div ng-message="required">Required field</div>
+                                </div>
+                            </md-input-container>
+                        </div>
+                        <div class="col-sm-12">
+                            <md-checkbox ng-model="vm.item.no_match_excluded" class="md-primary">
+                                No Match Excluded
+                            </md-checkbox>
+                        </div>
+                    </md-content>
+                </md-tab>
+                <md-tab label="Type">
+                    <md-content class="md-padding">
+                        <div class="col-sm-12">
+                            <md-input-container>
+                                <label>Type</label>
+                                <md-select ng-model="vm.item.type" name="type" ng-change="vm.item.category_id=null;vm.item.tag=null" required>
+                                    <md-option ng-repeat="option in ['CATEGORY','TAG']" ng-value="option">{{option}}</md-option>
+                                </md-select>
+                                <div ng-messages="groupForm.type.$error" role="alert">
+                                    <div ng-message="required">Required field</div>
+                                </div>
+                            </md-input-container>
+                        </div>
+                        <div class="col-sm-12" ng-if="vm.item.type=='CATEGORY'&&vm.categories">
+                            <md-input-container>
+                                <label>Category</label>
+                                <md-select ng-model="vm.item.category_id" name="category" required>
+                                    <md-option ng-repeat="category in vm.categories" ng-value="category.id">{{category.title}}</md-option>
+                                </md-select>
+                                <div ng-messages="groupForm.category.$error" role="alert">
+                                    <div ng-message="required">Required field</div>
+                                </div>
+                            </md-input-container>
+                        </div>
+                        <div class="col-sm-12" ng-if="vm.item.type=='TAG'">
+                            <md-input-container>
+                                <input mdInput placeholder="Tag" name="tag" ng-model="vm.item.tag" required>
+                                <div ng-messages="groupForm.tag.$error" role="alert">
+                                    <div ng-message="required">Required field</div>
+                                </div>
+                            </md-input-container>
+                        </div>
+                    </md-content>
+                </md-tab>
+                <md-tab label="Filter Group">
+                    <md-content class="md-padding">
+                        <div class="col-sm-12">
+                            <md-input-container ng-if="vm.list.groups">
+                                <label>Group</label>
+                                <md-select ng-model="vm.item.filter_group_id" name="group" required>
+                                    <md-option ng-repeat="group in vm.list.groups" ng-value="group.id">{{group.title}}</md-option>
+                                </md-select>
+                                <!-- <div ng-messages="groupForm.group.$error" role="alert">
+                                <div ng-message="required">Required field</div>
+                            </div> -->
+                            </md-input-container>
+                        </div>
+                    </md-content>
+                </md-tab>
+                <md-tab label="Excluded Filters">
+                    <md-content class="md-padding">
+                        <p class="col-sm-12" ng-if="vm.list.filters">
+                            <md-autocomplete md-no-cache="true" md-selected-item-change="vm.addItem(item,vm.item.excluded_filters,true)" md-items="item in vm.list.filters| filter :vm.text"
+                                md-search-text="vm.text" md-item-text="item.label">
+                                <span>{{ item.label }}</span>
+                            </md-autocomplete>
+                        </p>
+                        <div class="col-sm-12">
+                            <span ng-repeat="filter in vm.item.excluded_filters">
+                                <a class="indigo m-b md-btn md-raised" ng-click="vm.item.excluded_filters.splice(vm.item.excluded_filters.indexOf(filter), 1)">{{vm.getFilterName(filter)}}</a>
+                            </span>
+                        </div>
+                    </md-content>
+                </md-tab>
+                <md-tab label="Excluded Categories">
+                    <md-content class="md-padding">
+                        <p class="col-sm-12">
+                            <md-autocomplete md-no-cache="true" md-selected-item-change="vm.addItem(item,vm.item.excluded_categories,true)" md-items="item in vm.categories| filter :vm.text"
+                                md-search-text="vm.text" md-item-text="item.title">
+                                <span>{{ item.title }}</span>
+                            </md-autocomplete>
+                        </p>
+                        <div class="col-sm-12">
+                            <span ng-repeat="category in vm.item.excluded_categories">
+                                <a class="indigo m-b md-btn md-raised" ng-click="vm.item.excluded_categories.splice(vm.item.excluded_categories.indexOf(category), 1)">{{vm.getCategoryName(category)}}</a>
+                            </span>
+                        </div>
+                        <div class="col-sm-12">
+                            <md-button class="blue" ng-click="vm.selectAll()">All</md-button>
+                        </div>
+                    </md-content>
+                </md-tab>
+            </md-tabs>
+        </md-dialog-content>
+        <md-dialog-actions layout="row">
+            <md-button ng-if="vm.item.id" ng-click="vm.deleteDialog()">Delete</md-button>
+            <span flex></span>
+            <div ng-messages="groupForm.$error" role="alert" class="text-danger">
+                <div ng-message="required">A required field is missing</div>
+                <div ng-message="min">A required field is wrong</div>
+            </div>
+            <md-button ng-click="vm.closeDialog()">Cancel</md-button>
+            <md-button ng-click="vm.item.is_group?vm.saveGroup(vm.item):vm.saveFilter(vm.item)" ng-disabled="groupForm.$error.required">Confirm</md-button>
+        </md-dialog-actions>
+    </form>
+</md-dialog>

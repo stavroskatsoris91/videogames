@@ -1,0 +1,206 @@
+<div class="row" dates-selector date-type="vm.dateType"to-date="vm.toDate" from-date="vm.fromDate" group-by="vm.groupBy" exclude-amazon="vm.excludeAmazon"
+  callback="vm.reload()">
+</div>
+<div class="row">
+  <div class="col-lg-12 col-md-12 col-sm-12">
+    <h3>Dispatch</h3>
+  </div>
+</div>
+<div class="row">
+  <div class="col-lg-12">
+    <div class="card">
+      <div class="card-heading">
+        <h2>Shipments/ period</h2>
+      </div>
+      <div class="card-body"> Total Shipments: {{vm.totalShipments}}
+        <div ng-if='vm.shipmentPerDay' ui-jp="plot" ui-options="
+            [
+              {
+                data : {{vm.shipmentPerDay}},
+                bars: { show: true, fill: true,  barWidth: 24 * 60 * 60 * 1000*0.8*{{vm.groupScale}}, lineWidth: 1, order: .2, fillColor: { colors: [{ opacity: 0.5 }, { opacity: 0.5}] }}
+              }
+            ], 
+            {
+              colors: ['{{app.color.primary}}'],
+              series: { shadowSize: 3 },
+              xaxis: { show: true, timezone: null, timeformat: '%d %b %y',font: { color: '#ccc' }, position: 'bottom',mode : 'time'},
+              yaxis:{ show: true, font: { color: '#ccc' }},
+              grid: { hoverable: true, clickable: true, borderWidth: 0, color: '#ccc' },
+              tooltip: true,
+              tooltipOpts: { content: '%x : %y.0',  defaultTheme: false, shifts: { x: 0, y: -40 } }
+            }
+          " style="height:220px" ui-refresh="vm.shipmentPerDay">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-12">
+    <div class="panel panel-card">
+      <div class="card-heading">
+        <h2>Undelivered Orders</h2>
+        <small>Orders/ period</small>
+      </div>
+      <div class="card-body">
+        Total Orders: {{vm.totalOrders}}
+        <div ng-if="vm.ordersPerDayGraph" ui-jp="plot" ui-options="
+          [
+            {
+              data : {{vm.ordersPerDayGraph}},
+              bars: { show: true, fill: true,  barWidth: 24 * 60 * 60 * 1000*0.8*{{vm.groupScale}}, lineWidth: 1, order: .2, fillColor: { colors: [{ opacity: 0.3 }, { opacity: 0.3}] }}
+            }
+          ], 
+          {
+            colors: ['{{app.color.danger}}'],
+            series: { shadowSize: 3 },
+            xaxis: { show: true, timezone: null, timeformat: '%d %b %y', font: { color: '#ccc' }, position: 'bottom',mode : 'time'},
+            yaxis:{ show: true, font: { color: '#ccc' }},
+            grid: { hoverable: true, clickable: true, borderWidth: 0, color: '#ccc' },
+            tooltip: true,
+            tooltipOpts: { content: '%x: %y.0',  defaultTheme: false, shifts: { x: 0, y: -40 } }
+          }
+        " style="height:220px" ui-refresh="vm.ordersPerDayGraph">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-8">
+    <div class="panel panel-card">
+      <div class="card-heading">
+        <h2>Cost</h2>
+        <small>Proco Fulfillment cost</small>
+      </div>
+      <div class="panel-body text-center">
+        <div class="m-v-lg">
+          <div class="h1 text-success font-bold">£{{vm.procoCost | number:2}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div class="panel panel-card">
+      <div class="card-heading">
+        <h2>Undelivered cost</h2>
+        <small>Total value of undelivered items</small>
+      </div>
+      <div class="panel-body text-center">
+        <div class="m-v-lg">
+          <div class="h1 text-success font-bold">£{{vm.totalAmount | number:2}}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-12">
+    <div class="panel panel-card">
+      <div class="card-heading">
+        <h2>Dispatch / format </h2>
+        <small>#orders dispatched per format and type</small>
+      </div>
+      <div class="panel-body">
+        <!-- <table class="table table-striped">
+          <thead>
+            <th>Format</th>
+            <th>Direct Send orders</th>
+            <th>Home Fill orders</th>
+          </thead>
+          <tbody>
+            <tr ng-repeat="line in vm.shipmentPerFormat | orderBy : 'line.format'">
+              <td>{{line.format}}</td>
+              <td>{{line.direct_send}}</td>
+              <td>{{line.home_fill}}</td>
+            </tr>
+          </tbody>
+        </table> -->
+        <h4>Home Fill orders</h4>
+        <div class="row" style="font-weight: bold; padding: 10px;">
+          <div class="col-xs-3">Format</div>
+          <div class="col-xs-2">Zone 1</div>
+          <div class="col-xs-2">Zone 2</div>
+          <div class="col-xs-2">Zone 3</div>
+          <div class="col-xs-3">Total</div>
+        </div>
+        <div ng-repeat="sales in vm.shipmentHome" class="col-sm-12" ng-style='vm.tableStyle($index)'>
+          <div data-toggle="collapse" class="row" ng-click="vm.collapseNext($event);">
+            <div class="col-xs-3">{{sales.product}}</div>
+            <div class="col-xs-2">{{sales.zone_1}}</div>
+            <div class="col-xs-2">{{sales.zone_2}}</div>
+            <div class="col-xs-2">{{sales.zone_3}}</div>
+            <div class="col-xs-3">{{sales.count}}</div>
+          </div>
+          <div class="collapse row" ng-if="sales.product=='A5'">
+            <div class="" ng-repeat="(key,value) in sales" ng-if="key=='q1'||key=='q2' ||key=='q3'||key=='q4to10'||key=='q11plus'" style="padding-top:10px">
+              <p class="col-xs-3" ng-if="key=='q1'">1</p>
+              <p class="col-xs-3" ng-if="key=='q2'">2</p>
+              <p class="col-xs-3" ng-if="key=='q3'">3 </p>
+              <p class="col-xs-3" ng-if="key=='q4to10'">4 to 10</p>
+              <p class="col-xs-3" ng-if="key=='q11plus'">11+</p>
+              <p class="col-xs-2">{{value.zone_1}}</p>
+              <p class="col-xs-2">{{value.zone_2}}</p>
+              <p class="col-xs-2">{{value.zone_3}}</p>
+              <p class="col-xs-3">{{value.count}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel-body">
+        <h4>Direct Send orders</h4>
+        <div class="row" style="font-weight: bold; padding: 10px;">
+          <div class="col-xs-3">Format</div>
+          <div class="col-xs-2">Zone 1</div>
+          <div class="col-xs-2">Zone 2</div>
+          <div class="col-xs-2">Zone 3</div>
+          <div class="col-xs-3">Total</div>
+        </div>
+        <div ng-repeat="sales in vm.shipmentAway" class="col-sm-12" ng-style='vm.tableStyle($index)'>
+          <div data-toggle="collapse" class="row" ng-click="vm.collapseNext($event);">
+            <div class="col-xs-3">{{sales.product}}</div>
+            <div class="col-xs-2">{{sales.zone_1}}</div>
+            <div class="col-xs-2">{{sales.zone_2}}</div>
+            <div class="col-xs-2">{{sales.zone_3}}</div>
+            <div class="col-xs-3">{{sales.count}}</div>
+          </div>
+          <div class="collapse row" ng-if="sales.product=='A5'">
+            <div class="" ng-repeat="(key,value) in sales" ng-if="key=='q1'|| key=='q2' || key=='q3' || key=='q4to10'||key=='q11plus'" style="padding-top:10px">
+              <p class="col-xs-3" ng-if="key=='q1'">1</p>
+              <p class="col-xs-3" ng-if="key=='q2'">2</p>
+              <p class="col-xs-3" ng-if="key=='q3'">3</p>
+              <p class="col-xs-3" ng-if="key=='q4to10'">4 to 10</p>
+              <p class="col-xs-3" ng-if="key=='q11plus'">11+</p>
+              <p class="col-xs-2">{{value.zone_1}}</p>
+              <p class="col-xs-2">{{value.zone_2}}</p>
+              <p class="col-xs-2">{{value.zone_3}}</p>
+              <p class="col-xs-3">{{value.count}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row">
+  <div class="col-sm-12">
+    <div class="panel panel-card">
+      <div class="card-heading">
+        <h2>Undelivered / format </h2>
+        <small>#undelivered orders per format</small>
+      </div>
+      <div class="panel-body">
+        <table class="table table-striped">
+          <thead>
+            <th>Format</th>
+            <th>orders</th>
+          </thead>
+          <tbody>
+            <tr ng-repeat="(format,value) in vm.undeliveredPerFormat">
+              <td>{{format}}</td>
+              <td>{{value}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

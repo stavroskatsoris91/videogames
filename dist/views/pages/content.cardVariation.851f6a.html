@@ -1,0 +1,483 @@
+<!-- List -->
+<div class="row" ng-if="!vm.variationId">
+  <div class="col-sm-12">
+    <div class="card">
+      <div class="card-heading">
+        <h4 class="text-center">Card Variation</h4>
+      </div>
+      <div class="card-body">
+        <div class="h4">
+          <md-input-container>
+            <input mdInput placeholder="Search" ng-model="vm.test">
+          </md-input-container>
+          <md-checkbox ng-model="show" class="md-primary">
+            Show All
+          </md-checkbox>
+          <span class="pull-right" ng-if="vm.campaign!=='referral'">
+            <md-button class="md-raised md-primary" ui-sref="content.cardVariation({id: 'new'})">New Card Variation</md-button>
+          </span>
+        </div>
+        <table class="table table-hover" ng-if="vm.ready">
+          <thead>
+            <tr>
+              <th ng-click="vm.active('rank')" style="width: 100px">Rank
+                <i ng-class="vm.arrow('rank')">
+              </th>
+              <th ng-click="vm.active('name')">Name
+                <i ng-class="vm.arrow('name')">
+              </th>
+              <th ng-click="vm.active('formant')">Format
+                <i ng-class="vm.arrow('formant')">
+              </th>
+              <th ng-click="vm.active('enable')">Visible
+                <i ng-class="vm.arrow('enable')">
+              </th>
+              <th ng-if="show">Delete</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-mousedown="vm.selectedVar(variation)" ng-mouseup="vm.changeRank(variation)" ng-class="{'danger':!variation.enable}"
+              ng-if="variation.enable||(show&&!variation.enable)" ng-repeat="variation in vm.variationList | filter: vm.test | orderBy : vm.selected : vm.reverse">
+              <td>
+                <span ng-if="variation.save" style="position: absolute;left: 20px;">
+                  <a class="blue glyphicon rounded" ng-click="variation.save=false;vm.updateVariation(variation)">
+                    <i class="icon mdi-navigation-check i-20"></i>
+                  </a>
+                </span>
+                <md-input-container style="margin: 0;height: 30px;">
+                  <input mdInput placeholder="" ng-model="variation.rank" type="number" ng-change="variation.save=true">
+                </md-input-container>
+              </td>
+              <td ui-sref="content.cardVariation({id: variation.id})">
+                <a>{{variation.name}}</a>
+              </td>
+              <td ui-sref="content.cardVariation({id: variation.id})">{{variation.format}}</td>
+              <td ui-sref="content.cardVariation({id: variation.id})">{{variation.enable?"YES":"NO"}}</td>
+              <td ng-click="vm.deleteCardVariation(variation)" ng-if="!variation.enable">
+                <i class="icon mdi-content-clear i-20"></i>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="row" ng-if="!vm.ready">
+  <div class="col-sm-12">
+    <div class="panel panel-card">
+      <div class="panel-body text-center">
+        <p>Loading</p>
+        <md-progress-linear md-mode="indeterminate" class="m-b"></md-progress-linear>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Single -->
+<div class="row" ng-if="vm.ready&&vm.variationId">
+  <div class="col-sm-4">
+    <div class="panel panel-card">
+      <div class="r-t">
+        <a href class="inline">
+          <img ng-src="{{vm.variation.assets[0].images[0].image}}" class="img-responsive">
+        </a>
+      </div>
+      <div class="p">
+        <strong class="text-danger" ng-if="!vm.variation.enable">This Card Variation is Disabled</strong>
+        <div class="row">
+          <div class="col-xs-12">
+            <h4>{{vm.variation.name}}</h4>
+          </div>
+        </div>
+      </div>
+      <div class="list-group no-radius no-border">
+        <div class="list-group-item">
+          <span class="pull-right">{{vm.variation.format}}</span> Format
+        </div>
+        <div class="list-group-item">
+          <span class="pull-right">{{vm.variation.supported_orientation.length}}</span> Orientations
+        </div>
+        <div class="list-group-item">
+          <span class="pull-right">{{vm.variation.style.style_name}}</span> Label Colour
+        </div>
+        <div class="list-group-item">
+          <span class="pull-right">{{vm.variation.rank}}</span> Position
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-8" ng-if="vm.variationId==='new'">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="panel panel-card">
+          <div class="card-heading">
+            <md-input-container class="md-block">
+              <input mdInput placeholder="Name" ng-model="vm.variation.name" required>
+              <div ng-messages="main.$error" role="alert">
+                <div ng-message="required">Required field</div>
+              </div>
+            </md-input-container>
+          </div>
+          <div class="panel-body">
+            <form name="main">
+              <div class="row">
+                <div class="col-sm-6">
+                  <md-input-container class="md-block">
+                    <input mdInput name="printer" type="number" placeholder="Printer Template" ng-model="vm.variation.printer_info.template_id"
+                      min="1" required>
+                    <div ng-messages="main.printer.$error" role="alert">
+                      <div ng-message="required">Required field</div>
+                      <div ng-message="min">Can't be less than 1</div>
+                    </div>
+                  </md-input-container>
+                </div>
+                <div class="col-sm-6">
+                  <md-input-container class="md-block">
+                    <label>Format</label>
+                    <md-select ng-model="vm.variation.format" required>
+                      <md-option ng-repeat="format in vm.formatList" ng-value="format">{{format}}</md-option>
+                    </md-select>
+                    <div ng-messages="main.$error" role="alert">
+                      <div ng-message="required">Required field</div>
+                    </div>
+                  </md-input-container>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-6">
+                  <md-input-container class="md-block">
+                    <label>Orientations</label>
+                    <md-select ng-model="vm.variation.supported_orientation" multiple required>
+                      <md-option ng-value="orientation" ng-repeat="orientation in vm.orientations">{{orientation}}</md-option>
+                    </md-select>
+                    <div ng-messages="main.$error" role="alert">
+                      <div ng-message="required">Required field</div>
+                    </div>
+                  </md-input-container>
+                </div>
+                <div class="col-sm-6">
+                  <md-input-container class="md-block">
+                    <input mdInput placeholder="Label Colour" ng-model="vm.variation.style.style_name" required>
+                    <div ng-messages="main.$error" role="alert">
+                      <div ng-message="required">Required field</div>
+                    </div>
+                  </md-input-container>
+                </div>
+              </div>
+              <div class="col-sm-12" ng-repeat="asset in vm.variation.assets">
+                <div class="row">
+                  <div class="col-sm-4">Asset {{$index+1}}</div>
+                  <div class="col-sm-6">
+                    <md-input-container>
+                      <input mdInput placeholder="Name" ng-model="asset.name" required>
+                      <div ng-messages="main.$error" role="alert">
+                        <div ng-message="required">Required field</div>
+                      </div>
+                    </md-input-container>
+                    <a ng-if="$index>1" ng-click="vm.removeItem(asset,vm.variation.assets)">
+                      <i class="icon mdi-content-clear i-20 pull-right"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-12 text-center">
+                <a ng-click="vm.addItem({name:null,images:[]},vm.variation.assets)">
+                  <i class="btn-default btn-rounded btn-icon icon mdi-content-add i-20"></i>
+                </a>
+              </div>
+              <div class="col-sm-12">
+                <md-button class="md-raised md-primary pull-right" type="submit" ng-disabled="main.$error.required" ng-click="vm.createCardVariation()">Create Card Variation</md-button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-8" ng-if="vm.variationId!=='new'">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="panel panel-card">
+          <div class="panel-body">
+            <span class="pull-left">
+              <ul class="nav nav-pills m-b">
+                <li class="nav-item {{vm.variation.id?'active':''}}">
+                  <a href data-toggle="pill" data-target="#main-tab">Main</a>
+                </li>
+                <li class="nav-item">
+                  <a href data-toggle="pill" data-target="#filters-tab">Filters</a>
+                </li>
+                <li class="nav-item">
+                  <a href data-toggle="pill" data-target="#image-tab">Images</a>
+                </li>
+              </ul>
+            </span>
+            <span class="pull-right">
+              <md-button class="md-raised md-primary btn-fw m-b-sm" ng-click="vm.updateVariation()">Save</md-button>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-content">
+      <div class="tab-pane {{vm.variation.id?'active':''}}" id="main-tab" role="tabpanel">
+        <div class="row">
+          <div class="col-lg-12">
+            <form name="main">
+              <div class="panel panel-card">
+                <div class="card-heading">
+                  <h2>Main</h2>
+                </div>
+                <div class="panel-body">
+                  <div class="col-sm-12">
+                    <div class="row">
+                      <md-input-container class="col-sm-6">
+                        <input mdInput placeholder="Name" ng-model="vm.variation.name">
+                      </md-input-container>
+                      <md-input-container class="col-sm-6">
+                        <label>Format</label>
+                        <md-select ng-model="vm.variation.format" required>
+                          <md-option ng-repeat="format in vm.formatList" ng-value="format">{{format}}</md-option>
+                        </md-select>
+                        <div ng-messages="ImageGroup.$error" role="alert">
+                          <div ng-message="required">Required field</div>
+                        </div>
+                      </md-input-container>
+                    </div>
+                  </div>
+                  <div class="col-sm-12">
+                    <div class="row">
+                      <md-input-container class="col-sm-6">
+                        <input mdInput name="printer" placeholder="Printer Template" ng-model="vm.variation.printer_info.template_id" required>
+                        <div ng-messages="main.printer.$error" role="alert">
+                          <div ng-message="required">Required field</div>
+                        </div>
+                      </md-input-container>
+                      <md-input-container class="col-sm-6">
+                        <input name="rank" mdInput placeholder="Position" ng-model="vm.variation.rank" type="number" min="1" required>
+                        <div ng-messages="main.rank.$error" role="alert">
+                          <div ng-message="min">Can't be less than 1</div>
+                          <div ng-message="required">Required field</div>
+                        </div>
+                      </md-input-container>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="panel panel-card">
+                <div class="card-heading">
+                  <h2>Description</h2>
+                </div>
+                <div class="panel-body">
+                  <md-input-container class="md-block">
+                    <textarea placeholder="Title" ng-model="vm.variation.description.title" md-select-on-focus></textarea>
+                  </md-input-container>
+                  <md-input-container class="md-block">
+                    <textarea placeholder="Pop-Up" ng-model="vm.variation.popup" md-select-on-focus></textarea>
+                  </md-input-container>
+                  <md-input-container class="md-block">
+                    <textarea placeholder="Short Description" ng-model="vm.variation.description.short_description" md-select-on-focus></textarea>
+                  </md-input-container>
+                  <md-input-container class="md-block">
+                    <textarea placeholder="Long Description" ng-model="vm.variation.description.long_description" md-select-on-focus></textarea>
+                  </md-input-container>
+                  <md-input-container>
+                    <input placeholder="Buller Points" ng-model="bullet_points" md-select-on-focus>
+                  </md-input-container>
+                  <a ng-click="vm.variation.description.bullet_points.push(bullet_points);bullet_points=''">
+                    <i class="btn-default btn-rounded btn-icon icon mdi-content-add i-20"></i>
+                  </a>
+                  <ul ng-mouseleave="vm.selectedOccasion(0,false,vm.variation.occasion_filter,true)" ng-mouseup="vm.selectedOccasion(0,false,vm.variation.description.bullet_points,true)">
+                    <li ng-repeat="text in vm.variation.description.bullet_points track by $index" ng-mousedown="vm.selectedOccasion($index,true,vm.variation.description.bullet_points,edit)" ng-mouseover="vm.selectedOccasion($index,'over',vm.variation.description.bullet_points,edit)">
+                      <span ng-if="!edit" >{{text}}</span>
+                      <md-input-container ng-if="edit">
+                          <input placeholder="Buller Point" ng-if="edit" ng-model="vm.variation.description.bullet_points[$index]" md-select-on-focus>
+                        </md-input-container>
+                      <a ng-click="vm.variation.description.bullet_points.splice($index,1)">
+                        <i class="icon mdi-content-clear i-20 pull-right"></i>
+                      </a>
+                      <a ng-click="edit=!edit">
+                        <i class="i-20 pull-right" ng-class="{'mdi-action-done': edit,'mdi-editor-mode-edit' : !edit}"></i>
+                      </a>
+                    </li>
+                  </ul>
+                  <md-input-container class="md-block">
+                    <textarea placeholder="Disclaimer" ng-model="vm.variation.description.disclaimer" md-select-on-focus></textarea>
+                  </md-input-container>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="tab-pane" id="filters-tab" role="tabpanel">
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="panel panel-card">
+              <div class="panel-heading">
+                <label>View</label>
+                <div class="panel-body">
+                  <md-input-container>
+                    <input mdInput placeholder="Label Colour" ng-model="vm.variation.style.style_name">
+                  </md-input-container>
+                  <md-input-container>
+                    <label>Orientations</label>
+                    <md-select ng-model="vm.variation.supported_orientation" multiple required>
+                      <md-option ng-value="orientation" ng-repeat="orientation in vm.orientations">{{orientation}}</md-option>
+                    </md-select>
+                    <div ng-messages="ImageGroup.$error" role="alert">
+                      <div ng-message="required">Required field</div>
+                    </div>
+                  </md-input-container>
+                  <md-input-container>
+                    <md-checkbox ng-model="vm.variation.enable">Visible</md-checkbox>
+                  </md-input-container>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-12" ng-mouseleave="vm.selectedOccasion(0,false,vm.variation.occasion_filter)" ng-mouseup="vm.selectedOccasion(0,false,vm.variation.occasion_filter)">
+            <div class="panel panel-card">
+              <div class="panel-heading col-sm-12">
+                <div class="col-sm-3">
+                  <label>Occasions</label>
+                </div>
+                <div class="col-sm-9">
+                  <md-autocomplete md-no-cache="true" md-selected-item-change="vm.addItem(item.id,vm.variation.occasion_filter)" md-items="item in vm.categoryList| filter :vm.text.category"
+                    md-search-text="vm.text.category" md-item-text="item.title">
+                    <span>{{ item.title }}</span>
+                  </md-autocomplete>
+                </div>
+              </div>
+              <div class="panel-body">
+                <span ng-repeat="category in vm.variation.occasion_filter">
+                  <button class="btn-primary" ng-mousedown="vm.selectedOccasion($index,true,vm.variation.occasion_filter)" ng-mouseover="vm.selectedOccasion($index,'over',vm.variation.occasion_filter)">{{vm.categoryName(category)}} <i class="mdi mdi-navigation-cancel" ng-click="vm.removeItem(category,vm.variation.occasion_filter)"></i></button>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-pane" id="image-tab" role="tabpanel">
+        <md-button class="md-raised md-primary pull-right" ng-if="!vm.addAsset" ng-click="vm.addAsset=!vm.addAsset">new Asset</md-button>
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="panel panel-card" ng-if="vm.addAsset">
+            <div class="panel-body">
+              <md-input-container>
+                <input mdInput placeholder="Name" ng-model="name" required>
+                <div ng-messages="main.$error" role="alert">
+                  <div ng-message="required">Required field</div>
+                </div>
+              </md-input-container>
+              <md-button class="md-raised md-primary pull-right" ng-disabled="!name.length" ng-click="vm.saveAsset(name)">Save Asset</md-button>
+              <md-button class="md-raised md-primary pull-right" ng-click="vm.addAsset = false">Cancel</md-button>
+            </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="panel panel-card" ng-if="vm.variation.assets.length">
+              <md-tabs md-dynamic-height md-border-bottom md-swipe-content>
+                <md-tab label="{{asset.name?asset.name:'null'}}" ng-repeat="asset in vm.variation.assets">
+                  <md-content>
+                    <span class="pull-right">
+                      <ul class="list-inline">
+                        <li class="dropdown">
+                          <a data-toggle="dropdown" class="md-btn md-btn-circle">
+                            <i class="mdi-navigation-more-vert text-md"></i>
+                          </a>
+                          <ul class="dropdown-menu dropdown-menu-scale pull-right pull-up top text-color">
+                            <li>
+                              <a ng-click="vm.deleteAsset(asset,$index)">Delete Asset</a>
+                            </li>
+                          </ul>
+                        </li>
+                      </ul>
+                    </span>
+                    <div class="panel panel-body">
+                      <div class="h2 p">{{asset.name}}
+                      </div>
+                      <div class="row">
+                        <div class="col-sm-6">
+                          <md-input-container class="md-block">
+                            <label>Platform</label>
+                            <md-select ng-model="vm.imageGroup.platform_type" required>
+                              <md-option ng-repeat="platformType in vm.platform_typeList" ng-value="platformType">{{platformType}}</md-option>
+                            </md-select>
+                            <div ng-messages="ImageGroup.$error" role="alert">
+                              <div ng-message="required">Required field</div>
+                            </div>
+                          </md-input-container>
+                          <md-input-container class="md-block">
+                            <label>Type</label>
+                            <md-select ng-model="vm.imageGroup.image_size" required>
+                              <md-option ng-repeat="imageSize in vm.image_sizeList" ng-value="imageSize">{{imageSize}}</md-option>
+                            </md-select>
+                            <div ng-messages="ImageGroup.$error" role="alert">
+                              <div ng-message="required">Required field</div>
+                            </div>
+                          </md-input-container>
+                          <md-input-container class="md-block">
+                            <label>Name</label>
+                            <md-select ng-model="vm.imageName" multiple required>
+                              <md-option ng-value="imageName" ng-repeat="imageName in vm.image_nameList">{{imageName}}</md-option>
+                            </md-select>
+                            <div ng-messages="ImageGroup.$error" role="alert">
+                              <div ng-message="required">Required field</div>
+                            </div>
+                          </md-input-container>
+                        </div>
+                        <div class="col-sm-6">
+                          <input type="file" file-input="vm.imageGroup.image" id="{{'group_image_file_'+$index}}" ng-click="vm.selectedAsset=$index" onchange="angular.element(this).scope().vm.loadImage('group_image_file_','group_image_output')">
+                          <img class="img-responsive" id="{{'group_image_output'+$index}}" style="max-height: 200px;">
+                        </div>
+                        <div class="col-xs-12">
+                          <md-button class="md-raised md-primary pull-right" type="submit" ng-disabled="!vm.imageGroup.image||ImageGroup.$error.required"
+                            ng-click="vm.uploadImage(asset.asset_id)">Upload Image</md-button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-4 col-lg-3" ng-repeat="image in asset.images">
+                      <div class="panel panel-card">
+                        <div class="item">
+                          <span class="pull-right">
+                            <ul class="list-inline">
+                              <li class="dropdown">
+                                <a data-toggle="dropdown" class="md-btn md-btn-circle">
+                                  <i class="mdi-navigation-more-vert text-md"></i>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-scale pull-right pull-up top text-color">
+                                  <li>
+                                    <a ng-click="vm.updateImage(image,asset.asset_id)">Update Image</a>
+                                    <input type="file" file-input="vm.singleImage" id="singleImage" style="display:none" onchange="angular.element(this).scope().vm.loadImage('singleImage')">
+                                  </li>
+                                  <li>
+                                    <a ng-click="vm.deleteImage(image,asset.asset_id)">Delete Image</a>
+                                  </li>
+                                </ul>
+                              </li>
+                            </ul>
+                          </span>
+                          <img ng-src="{{image.image}}" class="w-full r-t">
+                        </div>
+                        <div class="text-center">
+                          <div class="list-group no-radius no-border">
+                            <div class="list-group-item">{{image.image_name}}</div>
+                            <div class="list-group-item">{{image.image_size}}</div>
+                            <div class="list-group-item">{{image.platform_type}}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </md-content>
+                </md-tab>
+              </md-tabs>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

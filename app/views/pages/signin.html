@@ -1,0 +1,40 @@
+  <div class="center-block w-xxl w-auto-xs p-v-md">
+    <div class="navbar">
+      <div class="navbar-brand m-t-lg text-center">
+          <img src="images/logo.png" alt="." style="max-height: 36px;">
+        <span class="m-l inline">{{app.name}}</span>
+      </div>
+    </div>
+
+    <div class="p-lg panel md-whiteframe-z1 text-color m">
+      <div class="m-b text-sm">
+        Sign in with your {{app.name}} Account
+      </div>
+      <form name="form">
+        <div class="md-form-group float-label">
+          <input type="email" class="md-input" ng-model="vm.email" required>
+          <label>Email</label>
+        </div>
+        <div class="md-form-group float-label">
+          <input type="password" class="md-input" ng-model="vm.password" required>
+          <label>Password</label>
+        </div>      
+        <!--<div class="m-b-md">        
+          <label class="md-check">
+            <input type="checkbox"><i class="indigo"></i> Keep me signed in
+          </label>
+        </div>-->
+        <button md-ink-ripple ng-click='vm.login()' type="submit" class="md-btn md-raised pink btn-block p-h-md">Sign in</button>
+      </form>
+    </div>
+
+    <div class="p-v-lg text-center">
+      <div>
+        Any issue with your credentials, please contact me.
+      </div>
+    </div>
+    <!--<div class="p-v-lg text-center">
+      <div class="m-b"><button ui-sref="access.forgot-password" class="md-btn">Forgot password?</button></div>
+      <div>Do not have an account? <button ui-sref="access.signup" class="md-btn">Create an account</button></div>
+    </div>-->
+  </div>

@@ -1,0 +1,378 @@
+<div class="row" ng-if="!vm.ready">
+    <div class="col-sm-6 col-md-offset-3">
+      <div class="panel panel-card">
+        <div class="panel-body text-center">
+          <p>Loading</p>
+          <md-progress-linear md-mode="indeterminate" class="m-b"></md-progress-linear>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row" ng-if="vm.ready">
+    <div class="col-sm-4">
+      <div class="panel panel-card">
+        <div class="r-t">
+          <a href class="inline">
+            <img ng-src="{{vm.category.image.medium}}" class="img-responsive">
+          </a>
+        </div>
+        <div class="p">
+          <strong class="text-danger" ng-if="!vm.category.visible">This Occasion is Disabled</strong>
+          <div class="row">
+            <div class="col-xs-12">
+            <h4>{{vm.category.title}}</h4>
+            </div>
+            <div class="col-xs-2">
+            </div>
+            <div class="col-xs-10">{{vm.category.description}}</div>
+          </div>
+        </div>
+        <div class="list-group no-radius no-border">
+          <div class="list-group-item">
+            <span class="pull-right badge bg-primary">{{vm.category.rank}}</span> Position
+          </div>
+          <div class="list-group-item">
+            <span class="pull-right" ng-class="vm.category.visible?'text-success':'text-danger'">{{vm.category.visible?"Visible":"Invisible"}}</span> Status
+          </div>
+          <div class="list-group-item">
+            <span class="pull-right badge bg-warning">{{vm.category.category_filters.length}}</span> Filters
+          </div>
+          <div class="list-group-item">
+            <span class="pull-right badge bg-warning">{{vm.category.generic_searches_excluded}}</span> generic Searches Excluded
+          </div>
+          <div class="list-group-item">
+            <span class="pull-right" ng-class="vm.category.remindable?'text-success':'text-danger'">{{vm.category.remindable?"Yes":"No"}}</span> Remindable
+          </div>
+          <div class="list-group-item" ng-if="vm.category.remindable">
+            <span class="pull-right">{{vm.category.reminder_type}}</span> Reminder Title
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-8" ng-if="vm.categoryId==='new'">
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="panel panel-card">
+            <div class="card-heading">
+              <h2>Main</h2>
+            </div>
+            <div class="panel-body">
+              <form name="main">
+                <md-input-container class="md-block">
+                  <input mdInput placeholder="Title" ng-model="vm.category.title">
+                </md-input-container>
+                <md-input-container class="md-block">
+                    <textarea placeholder="Description" ng-model="vm.category.description" rows="2" md-select-on-focus></textarea>
+                </md-input-container>
+                <md-input-container class="md-block">
+                  <input mdInput type="number" name="rank" placeholder="Rank" ng-model="vm.category.rank" min="0">
+                  <div ng-messages="main.rank.$error" role="alert">
+                    <div ng-message="min">
+                      Rank can not be less than 0
+                    </div>
+                  </div>
+                </md-input-container>
+                <div class="col-xs-3 control-label">
+                  <label>Image</label>
+                </div>
+                <div class="col-xs-9">
+                  <input type="file" file-input="vm.categoryImage" id="category_image" onchange="angular.element(this).scope().vm.loadImage('category_image','category_image_output')">
+                  <img class="img-responsive" id="category_image_output" style="max-height: 200px;">
+                </div>
+                <div class="col-xs-12">
+                  <md-button class="md-raised md-primary pull-right" type="submit" ng-disabled="!vm.queryCheck()" ng-click="vm.createCategory()">Create Occasion</md-button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-8" ng-if="vm.categoryId!=='new'">
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="panel panel-card">
+            <div class="panel-body">
+              <span class="pull-left" ng-if="vm.categoryId!=='new'">
+                <ul class="nav nav-pills m-b">
+                  <li class="nav-item {{vm.category.id?'active':''}}">
+                    <a href data-toggle="pill" data-target="#main-tab">Main</a>
+                  </li>
+                  <li class="nav-item">
+                    <a href data-toggle="pill" data-target="#filters-tab">Filters</a>
+                  </li>
+                  <li class="nav-item">
+                    <a href data-toggle="pill" data-target="#image-tab">Images</a>
+                  </li>
+                </ul>
+              </span>
+              <span class="pull-right">
+                <md-button class="md-raised md-primary btn-fw m-b-sm" ng-click="vm.changeStatus()">{{vm.category.visible?"Deactivate":"Activate"}}</md-button>
+                <md-button class="md-raised md-primary btn-fw m-b-sm" ng-click="vm.saveCategory()">Save</md-button>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-content">
+        <div class="tab-pane {{vm.category.id?'active':''}}" id="main-tab" role="tabpanel">
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="panel panel-card">
+                <div class="card-heading">
+                  <h2>Main</h2>
+                </div>
+                <div class="panel-body">
+                  <form name="main">
+                    <md-input-container class="md-block">
+                      <input mdInput placeholder="Title" ng-model="vm.category.title">
+                    </md-input-container>
+                    <md-input-container class="md-block">
+                        <textarea placeholder="Description" ng-model="vm.category.description" rows="2" md-select-on-focus></textarea>
+                    </md-input-container>
+                    <md-input-container class="md-block">
+                      <input mdInput type="number" name="rank" placeholder="Rank" ng-model="vm.category.rank" min="0">
+                      <div ng-messages="main.rank.$error" role="alert">
+                        <div ng-message="min">
+                          Rank can not be less than 0
+                        </div>
+                      </div>
+                    </md-input-container>
+                    <md-input-container>
+                      <md-checkbox ng-model="vm.category.generic_searches_excluded">generic Searches Excluded</md-checkbox>
+                    </md-input-container>
+                  </form>
+                </div>
+              </div>
+              <div class="panel panel-card">
+                <div class="card-heading">
+                  <h2>Image</h2>
+                </div>
+                <div class="panel-body">
+                  <div class="col-xs-3 control-label">
+                    <label>File</label>
+                  </div>
+                  <div class="col-xs-9">
+                    <input type="file" file-input="vm.categoryImage" id="category_image" onchange="angular.element(this).scope().vm.loadImage('category_image','category_image_output')">
+                    <img class="img-responsive" id="category_image_output" style="max-height: 200px;">
+                  </div>
+                  <div class="col-xs-12">
+                    <md-button class="md-raised md-primary pull-right" type="submit" ng-disabled="!vm.categoryImage" ng-click="vm.updateImage()">Upload Image</md-button>
+                  </div>
+                </div>
+              </div>
+              <div class="panel panel-card">
+                <div class="card-heading">
+                  <h2>Reminder</h2>
+                </div>
+                <div class="panel-body">
+                  <div class="col-xs-6">
+                    <md-input-container>
+                      <md-checkbox ng-model="vm.category.remindable">Remindable</md-checkbox>
+                    </md-input-container>
+                  </div>
+                  <div class="col-xs-6" ng-if="vm.category.remindable">
+                    <md-input-container>
+                      <label>Reminder</label>                        
+                      <md-select ng-model="vm.category.reminder_type">
+                        <md-option ng-repeat="reminder in vm.reminderType" ng-value="reminder.val">{{reminder.name}}</md-option>
+                      </md-select>
+                    </md-input-container>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tab-pane" id="filters-tab" role="tabpanel">
+          <div class="row">
+            <div class="col-xs-12">
+              <md-button class="md-raised md-primary btn-fw m-b-sm pull-right" ng-click="vm.createFilter()">New</md-button>
+            </div>
+            <div class="col-sm-12" ng-repeat="filter in vm.category.category_filters">
+              <div class="panel panel-card">
+                <md-content>
+                  <md-list flex>
+                    <md-list-item>
+                      <img ng-src="{{filter.image.original}}" class="md-avatar"alt="..."/>
+                      <div class="md-list-item-text" layout="column">
+                        <h4>{{filter.title}}</h4>
+                        <h5>Tags</h5>
+                        <p><span ng-repeat="tag in filter.tags">{{tag}} </span></p>
+                      </div>
+                        <md-button class="md-secondary md-icon-button" md-ink-ripple data-toggle="dropdown" aria-label="menu">
+                            <md-icon class="mdi-navigation-more-vert text-md"></md-icon>
+                          </md-button>
+                        <ul class="md-secondary dropdown-menu dropdown-menu-scale pull-right pull-up top text-color">
+                          <li><a ng-click="vm.editFilter(filter)">Edit</a></li>
+                          <li><a ng-click="vm.deleteFilter(filter)">Delete</a></li>
+                        </ul>
+                    </md-list-item>
+                  </md-list>
+                </md-content>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tab-pane" id="image-tab" role="tabpanel">
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="panel panel-card">
+                <div class="panel-body">
+                  <div class="row">
+                    <form name="ImageGroup">
+                      <div class="form-group">
+                        <div class="col-xs-3 control-label">
+                          <label>Platform</label>
+                        </div>
+                        <div class="col-xs-9">
+                          <md-input-container>
+                          <label>Platform</label>                        
+                            <md-select ng-model="vm.imageGroup.platform_type">
+                              <md-option ng-repeat="platformType in vm.platform_typeList" ng-value="platformType">{{platformType}}</md-option>
+                            </md-select>
+                            <div ng-messages="ImageGroup.$error" role="alert">
+                              <div ng-message="required">Required field</div>
+                            </div>
+                          </md-input-container>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <div class="col-xs-3 control-label">
+                          <label>Type</label>
+                        </div>
+                        <div class="col-xs-9">
+                          <md-input-container>
+                            <label>Type</label>
+                            <md-select ng-model="vm.imageGroup.image_size">
+                              <md-option ng-repeat="imageSize in vm.image_sizeList" ng-value="imageSize">{{imageSize}}</md-option>
+                            </md-select>
+                            <div ng-messages="ImageGroup.$error" role="alert">
+                              <div ng-message="required">Required field</div>
+                            </div>
+                          </md-input-container>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <div class="col-xs-3 control-label">
+                          <label>Name</label>
+                        </div>
+                        <div class="col-xs-9">
+                          <md-input-container>
+                            <label>Name</label>
+                            <md-select ng-model="vm.imageName" multiple required>
+                              <md-option ng-value="imageName" ng-repeat="imageName in vm.image_nameList">{{imageName}}</md-option>
+                            </md-select>
+                            <div ng-messages="ImageGroup.$error" role="alert">
+                              <div ng-message="required">Required field</div>
+                            </div>
+                          </md-input-container>
+                        </div>
+                      </div>
+                      <div class="form-group">
+                        <div class="col-xs-3 control-label">
+                          <label>File</label>
+                        </div>
+                        <div class="col-xs-9">
+                          <input type="file" file-input="vm.imageGroup.image" id="group_image_file" onchange="angular.element(this).scope().vm.loadImage('group_image_file','group_image_output')">
+                          <img class="img-responsive" id="group_image_output" style="max-height: 200px;">
+                        </div>
+                        <div class="col-xs-12">
+                          <md-button class="md-raised md-primary pull-right" type="submit" ng-disabled="!vm.imageGroup.image||ImageGroup.$error.required" ng-click="vm.uploadImage()">Upload Image</md-button>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-4 col-lg-3" ng-repeat="image in vm.category.platform_images">
+              <div class="panel panel-card">
+                <div class="item">
+                  <span class="pull-right">
+                    <a ng-click="vm.deleteImage(image)"><i class="icon mdi-content-clear i-20"></i></a>
+                  </span>
+                  <img ng-src="{{image.image}}" class="w-full r-t" style="height:180px">
+                </div>
+                <div class="text-center">
+                  <div class="list-group no-radius no-border">
+                    <div class="list-group-item">{{image.image_name}}</div>
+                    <div class="list-group-item">{{image.image_size}}</div>
+                    <div class="list-group-item">{{image.platform_type}}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<script type="text/ng-template" id="FilterDialog.tmpl.html" passive="true">
+    <md-dialog style="width:8000px;">
+      <form name="filterForm"  ng-submit="vm.answer(true)">
+        <md-toolbar>
+          <div class="md-toolbar-tools">
+            <h2>Suggested Filter</h2>
+          </div>
+        </md-toolbar>
+        <md-dialog-content style="max-width:8000px;max-height:810px; ">
+          <md-tabs>
+            <md-tab label="Title">
+              <md-content class="md-padding">
+                <p>
+                  <md-input-container>
+                    <input mdInput placeholder="Title" ng-model="vm.ev.title" required>
+                    <div ng-messages="filterForm.$error" role="alert">
+                      <div ng-message="required">Title is missing</div>
+                    </div>
+                  </md-input-container>
+                </p>
+              </md-content>
+            </md-tab>
+            <md-tab label="Image">
+              <md-content class="md-padding">
+                <p>
+                  <div class="col-xs-2" ng-if="vm.ev.image">
+                    <img class="img-responsive" ng-src="{{vm.ev.image?vm.ev.image.original:''}}">
+                  </div>
+                  <div class="col-xs-3">
+                      <input type="file" file-input="vm.image" id="image_file" onchange="angular.element(this).scope().vm.loadImage('image_file','output')">
+                  </div>
+                  <div class="col-xs-2">
+                      <img class="img-responsive" id="output">
+                  </div>
+                </p>
+              </md-content>
+            </md-tab>
+            <md-tab label="Tags">
+              <md-content class="md-padding">
+                <p>
+                  <div class="col-sm-3">
+                    <label>Tags</label>
+                  </div>
+                  <div class="col-sm-9">
+                    <div class="input-group">
+                      <input type="text" class="form-control" ng-model="vm.text.tag" placeholder="add a Tag">
+                      <span class="input-group-btn">
+                        <button type="button" class="btn btn-primary" ng-click="vm.addItem(vm.text.tag.toLowerCase(),vm.ev.tags)">Add</button>
+                      </span>
+                    </div>
+                  </div>
+                  <p>
+                    <span ng-repeat="tag in vm.ev.tags"> <button class="btn-primary"ng-click="vm.removeItem(tag,vm.ev.tags)">{{tag}}</button></span>
+                  </p>
+              </md-content>
+            </md-tab>
+          </md-tabs>
+        </md-dialog-content>
+        <md-dialog-actions layout="row">
+          <div ng-messages="filterForm.$error" role="alert" class="text-danger">
+            <div ng-message="required">Title is missing</div>
+          </div>
+          <md-button ng-click="vm.answer(false)">Cancel</md-button>
+          <md-button ng-click="vm.answer(true)" ng-disabled="filterForm.$error.required">Confirm</md-button>
+        </md-dialog-actions>
+      </form>
+    </md-dialog>
+  </script>

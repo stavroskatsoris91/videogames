@@ -1,0 +1,497 @@
+<div class="row">
+  <!--left hand side panel-->
+  <div class="col-sm-4">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="panel panel-card">
+          <div class="card-heading">
+            <h2>Advert</h2>
+          </div>
+          <div class="p">
+            Title <span class="pull-right">{{vm.advert.title}}</span>
+          </div>
+          <div class="list-group no-radius no-border">
+            <div class="list-group-item">
+              <p>Description</p>
+              <span>{{vm.advert.description}}</span>
+            </div>
+            <div class="list-group-item">
+              <span class="pull-right" ng-class="vm.advert.enabled?'text-success':'text-danger'">{{vm.advert.enabled?'Enabled':'Disabled'}}</span>              Status
+            </div>
+            <div class="list-group-item">
+              <span class="pull-right">{{vm.advert.type}}</span> Type
+            </div>
+            <div class="list-group-item">
+              <span class="pull-right">{{vm.advert.position}}</span> Position
+            </div>
+            <div class="list-group-item">
+              <span class="pull-right">{{vm.advert.advert_filter.categories.length?vm.advert.advert_filter.categories.length:'All'}}
+              </span> Included Categories
+            </div>
+            <div class="list-group-item" ng-if="vm.advert.advert_filter.excluded_categories.length">
+              <span class="pull-right text-danger">{{vm.advert.advert_filter.excluded_categories.length}}
+              </span> Excluded Categories
+            </div>
+            <div class="list-group-item">
+              <span class="pull-right">{{vm.advert.advert_filter.tags.length?vm.advert.advert_filter.tags.length:'All'}}
+              </span> Included Tags
+            </div>
+            <div class="list-group-item" ng-if="vm.advert.advert_filter.excluded_tags.length">
+              <span class="pull-right text-danger">{{vm.advert.advert_filter.excluded_tags.length}}
+              </span> Excluded Tags
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-8">
+    <div class="form-horizontal form-validation" ng-if="!vm.newAdvert">
+      <div class="col-md-12 col-lg-12">
+        <div class="panel panel-card">
+          <div class="panel-body">
+            <span class="pull-left">
+            <ul class="nav nav-pills m-b">
+              <li class="nav-item {{vm.advert?'active':''}}">
+                <a href data-toggle="pill" data-target="#main-tab">Main</a>
+              </li>
+              <li class="nav-item">
+                <a href data-toggle="pill" data-target="#filters-tab">Filters</a>
+              </li>
+              <li class="nav-item">
+                <a href data-toggle="pill" data-target="#image-tab">Image</a>
+              </li>
+              <li class="nav-item">
+                <a href data-toggle="pill" data-target="#view-tab">View</a>
+              </li>
+            </ul>
+            </span>
+            <span class="pull-right">
+              <md-button class="md-raised md-primary" ng-click="vm.stateAdvert()" ng-disabled="vm.saving">{{vm.advert.enabled?"DEACTIVATE":"ACTIVATE"}}</md-button>
+              <md-button class="md-raised md-primary" ng-click="vm.saveAdvert()" ng-disabled="vm.saving">Save</md-button>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="tab-content">
+      <div class="tab-pane {{vm.advert?'active':''}}" id="main-tab">
+        <div class="col-md-12 col-lg-6">
+          <div class="panel panel-card">
+            <div class="panel-heading h3">Name</div>
+            <div class="panel-body">
+              <div>
+                <md-input-container>
+                  <input mdInput placeholder="Title" ng-model="vm.advert.title" required>
+                </md-input-container>
+              </div>
+              <div>
+                <md-input-container class="md-block">
+                  <textarea placeholder="Description" ng-model="vm.advert.description" rows="5" md-select-on-focus required></textarea>
+                </md-input-container>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-12 col-lg-6">
+          <div class="panel panel-card">
+            <div class="panel-heading h3">Type</div>
+            <div class="panel-body">
+              <form name="type">
+                <div>
+                  <md-input-container >
+                    <label>Type</label>
+                    <md-select ng-model="vm.advert.type" required>
+                      <md-option value="PAGE">PAGE</md-option>
+                      <md-option value="EXPLORE">EXPLORE</md-option>
+                    </md-select>
+                  </md-input-container>
+                </div>
+                <div>
+                  <md-input-container>
+                    <label>Display</label>
+                    <md-select ng-model="vm.advert.position" required>
+                      <md-option value="BANNER">BANNER</md-option>
+                      <md-option value="INLINE">INLINE</md-option>
+                      <md-option value="POPUP">POPUP</md-option>
+                    </md-select>
+                  </md-input-container>
+                </div>
+                <div>
+                  <md-input-container>
+                    <input mdInput type="number" name="priority" placeholder="Priority" ng-model="vm.advert.priority" min="0" required>
+                    <div ng-messages="type.priority.$error" role="alert">
+                      <div ng-message="min">
+                        Priority can not be less than 0
+                      </div>
+                    </div>
+                  </md-input-container>
+                </div>
+                <div>
+                  <md-input-container>
+                    <label>Action Type</label>
+                    <md-select ng-model="vm.advert.action.type" required>
+                      <md-option value="SAME_TAB_LINK">SAME TAB LINK</md-option>
+                      <md-option value="NEW_TAB_LINK">NEW TAB LINK</md-option>
+                      <md-option value="POPUP">POP-UP</md-option>
+                    </md-select>
+                  </md-input-container>
+                </div>
+                <div>
+                  <md-input-container class="w-full">
+                    <input mdInput name="url" placeholder="Destination URL" ng-model="vm.advert.action.url">
+                  </md-input-container>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-pane" id="filters-tab">
+        <div class="col-md-12 col-lg-12">
+          <div class="panel panel-card">
+            <div class="panel-heading h3">URL</div>
+            <div class="panel-body">
+              <div class="row">
+                <div class="form-group">
+                  <div class="col-xs-3 control-label">
+                    <label>Url contains</label>
+                  </div>
+                  <div class="col-xs-9">
+                    <input type="text" class="form-control" placeholder="Url contains" ng-model="vm.advert.advert_filter.url_contains">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-xs-3 control-label">
+                    <label>Url is</label>
+                  </div>
+                  <div class="col-xs-9">
+                    <input type="text" class="form-control" placeholder="Url is" ng-model="vm.advert.advert_filter.url_is">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-12 col-lg-6">
+          <div class="panel panel-card">
+            <div class="panel-heading h3">Categories</div>
+            <div class="panel-body">
+              <div class="form-group">
+                <div class="col-xs-3 control-label">
+                  <label>Included Categories</label>
+                </div>
+                <div class="col-xs-9">
+                  <md-autocomplete md-no-cache="true" md-selected-item-change="vm.addItem(item,vm.filters.categories)" md-items="item in vm.categoryList| filter :vm.text.IncludedCategory"
+                    md-search-text="vm.text.IncludedCategory" md-item-text="item.title">
+                    <span>{{ item.title }}</span>
+                  </md-autocomplete>
+                </div>
+                <div class="col-xs-12">
+                  <span ng-repeat="category in vm.filters.categories"> <button class="btn-primary" ng-click="vm.removeItem(category,vm.filters.categories)">{{category.title}}</button></span>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="col-xs-3 control-label">
+                  <label>Excluded Categories</label>
+                </div>
+                <div class="col-xs-9">
+                  <md-autocomplete md-no-cache="true" md-selected-item-change="vm.addItem(item,vm.filters.excluded_categories)" md-items="item in vm.categoryList| filter :vm.text.excludedCategories"
+                    md-search-text="vm.text.excludedCategories" md-item-text="item.title">
+                    <span>{{ item.title }}</span>
+                  </md-autocomplete>
+                </div>
+                <div class="col-xs-12">
+                  <span ng-repeat="category in vm.filters.excluded_categories"> <button class="btn-primary" ng-click="vm.removeItem(category,vm.filters.excluded_categories)">{{category.title}}</button></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-12 col-lg-6">
+          <div class="panel panel-card">
+            <div class="panel-heading h3">Tags</div>
+            <div class="panel-body">
+              <div class="form-group">
+                <div class="col-xs-3 control-label">
+                  <label>Included Tags</label>
+                </div>
+                <div class="col-xs-9">
+                  <form ng-submit="vm.addItem(vm.text.tag.toLowerCase(),vm.filters.tags)">
+                    <div class="input-group">
+                      <input type="text" class="form-control" ng-model="vm.text.tag" placeholder="add a Tag">
+                      <span class="input-group-btn">
+                              <button type="button" class="btn btn-primary" ng-click="vm.addItem(vm.text.tag.toLowerCase(),vm.filters.tags)">Add</button>
+                            </span>
+                    </div>
+                  </form>
+                </div>
+                <div class="col-xs-12">
+                  <span ng-repeat="tag in vm.filters.tags"> <button class="btn-primary" ng-click="vm.removeItem(tag,vm.filters.tags)">{{tag}}</button></span>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="col-xs-3 control-label">
+                  <label>Excluded Tags</label>
+                </div>
+                <div class="col-xs-9">
+                  <form ng-submit="vm.addItem(vm.text.excludedTags.toLowerCase(),vm.filters.excluded_tags)">
+                    <div class="input-group">
+                      <input type="text" class="form-control" ng-model="vm.text.excludedTags" placeholder="add a Tag">
+                      <span class="input-group-btn">
+                              <button type="button" class="btn btn-primary" ng-click="vm.addItem(vm.text.excludedTags.toLowerCase(),vm.filters.excluded_tags)">Add</button>
+                            </span>
+                    </div>
+                  </form>
+                </div>
+                <div class="col-xs-12">
+                  <span ng-repeat="tag in vm.filters.excluded_tags"> <button class="btn-primary" ng-click="vm.removeItem(tag,vm.filters.excluded_tags)">{{tag}}</button></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-pane" id="image-tab">
+        <div class="col-md-12 col-lg-12">
+          <div class="panel panel-card">
+            <div class="panel-heading h3">add/replace platform image</div>
+            <div class="panel-body">
+              <div class="row">
+                <div class="form-group">
+                  <div class="col-xs-3 control-label">
+                    <label>Platform</label>
+                  </div>
+                  <div class="col-xs-9">
+                    <md-input-container>
+                      <label>Platform</label>
+                      <md-select ng-model="vm.platformImages.platform_type">
+                        <md-option value="ANDROID">ANDROID</md-option>
+                        <md-option value="IOS">IOS</md-option>
+                        <md-option value="WEB">WEB</md-option>
+                        <md-option value="API">API</md-option>
+                      </md-select>
+                    </md-input-container>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-xs-3 control-label">
+                    <label>Type</label>
+                  </div>
+                  <div class="col-xs-9">
+                    <md-input-container>
+                      <label>Type</label>
+                      <md-select ng-model="vm.platformImages.image_size">
+                        <md-option value="DESKTOP">DESKTOP</md-option>
+                        <md-option value="MOBILE">MOBILE</md-option>
+                        <md-option value="TABLET">TABLET</md-option>
+                      </md-select>
+                    </md-input-container>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-xs-3 control-label">
+                    <label>Name</label>
+                  </div>
+                  <div class="col-xs-9">
+                    <md-input-container>
+                      <label>Name</label>
+                      <md-select ng-model="vm.platformImages.image_name">
+                        <md-option value="mobile">mobile</md-option>
+                        <md-option value="mobile-large">mobile-large</md-option>
+                        <md-option value="tablet">tablet</md-option>
+                        <md-option value="desktop">desktop</md-option>
+                        <md-option value="desktop-large">desktop-large</md-option>
+                      </md-select>
+                    </md-input-container>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-xs-3 control-label">
+                    <label>File</label>
+                  </div>
+                  <div class="col-xs-9">
+                    <input type="file" file-input="vm.platformImages.image" id="image_file">
+                  </div>
+                  <div class="col-xs-12">
+                    <md-button class="md-raised md-primary pull-right" type="submit" ng-click="vm.uploadImage()">Upload Image</md-button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-12 col-lg-6" ng-repeat="image in vm.advert.platform_images">
+          <div class="panel panel-card">
+            <div class="panel-heading h3">Image {{$index+1}}
+              <span class="pull-right">
+                <a ng-click="vm.deleteImage(image)"><i class="icon mdi-content-clear i-20"></i></a>
+              </span>
+            </div>
+              <div class="list-group no-radius no-border">
+                <div class="list-group-item">
+                  Platform
+                  <span class="pull-right">{{image.platform_type}}</span>
+                </div>
+                <div class="list-group-item">
+                  Type
+                  <span class="pull-right">{{image.image_size}}</span>
+                </div>
+                <div class="list-group-item">
+                  Name
+                  <span class="pull-right">{{image.image_name}}</span>
+                </div>
+              </div>
+            <div class="w">
+              <img class="img-responsive"ng-src="{{image.image}}">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-pane" id="view-tab">      
+        <div class="col-md-12 col-lg-12">
+          <div class="panel panel-card">
+            <div class="panel-heading h3">Preview</div>
+            <div class="panel-body">
+              <span style="font-size : 15px">
+                <strong> {{vm.advert.content.pre_text + ' '}}
+                        {{vm.advert.content.text}}</strong>
+                <span style="font-size : 12px" ng-if="vm.advert.content.code">
+                  <strong>{{vm.advert.content.code_prefix}}</strong>
+                  <span> {{vm.advert.content.code}}
+                          {{vm.advert.content.destination}}
+                  </span>
+                </span>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-12 col-lg-12">
+          <div class="panel panel-card">
+            <div class="panel-heading h3">Content</div>
+            <div class="panel-body">
+              <md-input-container class="col-md-12">
+                <input mdInput placeholder="Pre Text" ng-model="vm.advert.content.pre_text" required>
+              </md-input-container>
+              <md-input-container class="col-md-12">
+                <input mdInput placeholder="Text" ng-model="vm.advert.content.text" required>
+              </md-input-container>
+              <md-input-container class="col-md-12">
+                <input mdInput placeholder="Code Prefix" ng-model="vm.advert.content.code_prefix" required>
+              </md-input-container>
+              <md-input-container class="col-md-12">
+                <input mdInput placeholder="Code" ng-model="vm.advert.content.code" required>
+              </md-input-container>
+              <md-input-container class="col-md-12">
+                <input mdInput placeholder="Destination" ng-model="vm.advert.content.destination" required>
+              </md-input-container>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+    <form class="form-horizontal form-validation" name="createAdv" ng-if="vm.newAdvert">
+      <div class="col-md-12 col-lg-6">
+        <div class="panel panel-card">
+          <div class="panel-heading h3">Name</div>
+          <div class="panel-body">
+            <div>
+              <md-input-container>
+                <input mdInput placeholder="Title" ng-model="vm.advert.title" required>
+                <div ng-messages="createAdv.$error" role="alert">
+                    <div ng-message="required">
+                        Required Field
+                    </div>
+                  </div>
+              </md-input-container>
+            </div>
+            <div>
+              <md-input-container class="md-block">
+                <textarea placeholder="Description" ng-model="vm.advert.description" rows="5" md-select-on-focus required></textarea>
+                <div ng-messages="createAdv.$error" role="alert">
+                    <div ng-message="required">
+                        Required Field
+                    </div>
+                  </div>
+              </md-input-container>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-12 col-lg-6">
+        <div class="panel panel-card">
+          <div class="panel-heading h3">Type</div>
+          <div class="panel-body">
+            <div>
+              <md-input-container >
+                <label>Type</label>
+                <md-select ng-model="vm.advert.type" required>
+                  <md-option value="PAGE">PAGE</md-option>
+                  <md-option value="EXPLORE">EXPLORE</md-option>
+                </md-select>
+                <div ng-messages="createAdv.$error" role="alert">
+                    <div ng-message="required">
+                        Required Field
+                    </div>
+                  </div>
+              </md-input-container>
+            </div>
+            <div>
+              <md-input-container>
+                <label>Display</label>
+                <md-select name="display" ng-model="vm.advert.position" required>
+                  <md-option value="BANNER">BANNER</md-option>
+                  <md-option value="INLINE">INLINE</md-option>
+                  <md-option value="POPUP">POPUP</md-option>
+                </md-select>
+                <div ng-messages="createAdv.display.$error" role="alert">
+                    <div ng-message="required">
+                        Required Field
+                    </div>
+                  </div>
+              </md-input-container>
+            </div>
+            <div>
+              <md-input-container>
+                <input mdInput type="number" name="priority" placeholder="Priority" ng-model="vm.advert.priority" min="0" required>
+                <div ng-messages="createAdv.priority.$error" role="alert">
+                  <div ng-message="min">
+                    Priority can not be less than 0
+                  </div>
+                  <div ng-message="required">
+                      Required Field
+                  </div>
+                </div>
+              </md-input-container>
+            </div>
+            <div>
+              <md-input-container>
+                <label>Action Type</label>
+                <md-select name="actionType" ng-model="vm.advert.action.type" required>
+                  <md-option value="SAME_TAB_LINK">SAME TAB LINK</md-option>
+                  <md-option value="NEW_TAB_LINK">NEW TAB LINK</md-option>
+                  <md-option value="POPUP">POP-UP</md-option>
+                </md-select>
+                <div ng-messages="createAdv.$error" role="alert">
+                  <div ng-message="required">
+                      Required Field
+                  </div>
+                </div>
+              </md-input-container>
+            </div>
+            <div>
+              <md-input-container class="w-full">
+                <input mdInput name="url" placeholder="Destination URL" ng-model="vm.advert.action.URL">
+              </md-input-container>
+            </div>
+          </div>
+        </div>
+      </div>
+      <span class="pull-right">
+        <md-button class="md-raised md-primary" type="submit" ng-click="vm.createAdvert()"
+            ng-disabled="createAdv.$error.validator||createAdv.$error.required">CREATE ADVERT</md-button>
+      </span>
+    </form>
+  </div>
+</div>
+<!--right hand side panel-->
