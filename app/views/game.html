@@ -1,14 +1,20 @@
 <div class="jumbotron game">
   {{Ctrl.text}}
-  <div class="image-group">
-    <div class="images" ng-style="{backgroundImage: 'url(/images/number1.jpg)'}" ng-click="open=true;"></div>
-    <div class="images" ng-style="{backgroundImage: 'url(/images/number2.jpg)'}" ng-click="open=true;"></div>
-    <div class="images" ng-style="{backgroundImage: 'url(/images/number3.jpg)'}" ng-click="open=true;"></div>
-    <div class="images" ng-style="{backgroundImage: 'url(/images/number4.jpg)'}" ng-click="open=true;"></div>
+  <div>
+    <iframe width="420" height="315"
+    src="https://www.youtube.com/embed/tgbNymZ7vqY">
+    </iframe>
   </div>
-  <div id="myModal" class="modal"  ng-class="{open:open}" ng-click="open=false">
-      <span class="close">&times;</span>
-      <img class="modal-content" id="img01">
-      <div id="caption"></div>
+  <div class="image-group">
+    <div class="images" ng-repeat="image in Ctrl.images"ng-style="{backgroundImage: 'url('+image.img+')'}" ng-click="Ctrl.index=$index;Ctrl.group=Ctrl.images"></div>
+  </div>
+  <div class="modal"  ng-class="{open:Ctrl.group}">
+      <span class="close" ng-click="Ctrl.group=null">&times;</span>
+      <div class="pre-content">
+        <img class="modal-content" ng-src="{{Ctrl.group[Ctrl.index].img}}">
+        <span class="left" ng-click="Ctrl.index = Math.max(0, Ctrl.index-1)" ><</span>
+        <span class="right" ng-click="Ctrl.index = Math.min(Ctrl.index+1,Ctrl.group.length-1)" >></span>
+      </div>
+      <div class="caption">{{Ctrl.group[Ctrl.index].caption}}</div>
     </div>
 </div>

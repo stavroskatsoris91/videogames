@@ -15,38 +15,13 @@
     <!-- endbuild -->
     <base href="/">
   </head>
-  <body ng-app="videogamesApp">
+  <body ng-app="videogamesApp" global-listener>
     <!--[if lte IE 8]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
 
     <!-- Add your site or application content here -->
-    <div class="header">
-      <div class="navbar navbar-default" role="navigation">
-        <div class="container">
-          <div class="navbar-header">
-
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#js-navbar-collapse">
-              <span class="sr-only">Toggle navigation</span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-            </button>
-
-            <a class="navbar-brand" href="#/">videogames</a>
-          </div>
-
-          <div class="collapse navbar-collapse" id="js-navbar-collapse">
-
-            <ul class="nav navbar-nav">
-              <li class="active"><a href="#/">Home</a></li>
-              <li><a ng-href="#/about">About</a></li>
-              <li><a ng-href="#/game">Game</a></li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
+    <header></header>
 
     <div class="container">
     <div ng-view=""></div>
@@ -86,6 +61,10 @@
 
         <!-- build:js({.tmp,app}) scripts/scripts.js -->
         <script src="scripts/app.js"></script>
+        <script src="scripts/directives/global-listener.js"></script>
+        <script src="scripts/directives/header.js"></script>
+        <script src="scripts/directives/hero.js"></script>
+        <script src="scripts/directives/canvas.js"></script>
         <script src="scripts/controllers/main.js"></script>
         <script src="scripts/controllers/about.js"></script>
         <script src="scripts/controllers/game.js"></script>

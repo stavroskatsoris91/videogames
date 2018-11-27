@@ -1,0 +1,8 @@
+<div class="herobox" id="hero">
+    <div class="hero" ng-class="{'left': Ctrl.direction<0, 'copy': Ctrl.first}">
+        <img ng-src="/images/all.png" ng-style="Ctrl.animation()">
+    </div>
+    <div class="hero" ng-class="{'left': Ctrl.direction<0, 'copy': !Ctrl.first}">
+        <img ng-src="/images/all.png" ng-style="Ctrl.animation()">
+    </div>
+</div>

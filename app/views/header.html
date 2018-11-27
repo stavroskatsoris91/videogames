@@ -1,0 +1,29 @@
+<div class="header">
+  <div class="navbar navbar-default" role="navigation">
+    <div class="container">
+      <div class="navbar-header">
+
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#js-navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+
+        <a class="navbar-brand" href="#/">videogames</a>
+      </div>
+
+      <div class="collapse navbar-collapse" id="js-navbar-collapse">
+
+        <ul class="nav navbar-nav">
+          <li ng-class="{active:location.$$path==='/'}"><a href="#/">Home</a></li>
+          <li ng-class="{active:location.$$path==='/about'}"><a ng-href="#/about">About</a></li>
+          <li ng-class="{active:location.$$path==='/game'}"><a ng-href="#/game">Game</a></li>
+        </ul>
+      </div>
+      <hero></hero>
+      <canvas my-canvas width="400" height="200" >
+        Your browser does not support the HTML5 canvas tag.</canvas>
+    </div>
+  </div>
+</div>
